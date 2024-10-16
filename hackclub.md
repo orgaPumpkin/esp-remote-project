@@ -1,4 +1,4 @@
-![web_page.png](web_page.png)
+![web_page.png](https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/web_page.png)
 
 ![wakatime](https://img.shields.io/endpoint?url=https%3A%2F%2Fwaka.hackclub.com%2Fapi%2Fcompat%2Fshields%2Fv1%2FU07QBRYGVHC%2Fall_time%2Fproject%253Aesp-remote)
 
@@ -28,4 +28,4 @@ which means that in total, the amount of time spent might be more than triple th
 In the future, I plan on adding message scheduling and device profiles features.
 
 # More Info And How To Use
-More info can be found in the [main readme](readme.md).
+More info can be found in the [main readme](https://github.com/orgaPumpkin/esp-remote-project/blob/master/readme.md).
