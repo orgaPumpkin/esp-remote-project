@@ -1,0 +1,271 @@
+<html>
+<script>
+	if ( window.history.replaceState ) {
+		window.history.replaceState( null, null, window.location.href );
+	}
+</script>
+<head>
+	<title>ESP Web Server</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		.alert{
+			display: none;
+			position: absolute;
+			bottom: 0;
+			background: rgba(116, 195, 225, 1);
+			border: 1px solid #0F3376;
+			border-radius: 15px;
+			width: fit-content	;
+			margin: 3px;
+
+		}
+		ul{
+			padding: 0;
+			list-style: none;
+		}
+		html *{
+			color: #191919;
+			font-family: Helvetica,sans-serif;
+		}
+
+		.column {
+			padding: 5px;
+			border-top: none;
+			flex-grow: 1;
+		}
+		.row{
+			height: 100%;
+			align-items: stretch;
+			display: flex;
+			flex-wrap: wrap;
+			align-content: stretch;
+
+		}
+		li{
+			display: flex;
+			align-content: center;
+			align-items: center;
+
+		}
+		li a,.toggle-form{
+			margin-left: auto;
+		}
+		li form{
+			margin: 0;
+		}
+		button,input[type=submit],select{
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(71, 176, 195);
+			border-radius: 5px;
+			padding: 3px;
+		}
+		button[name=remove_toggle],button[name=remove_field]{
+			background-color: rgba(255, 0, 0, 0.57);
+		}
+		 button:hover, input[type=submit]:hover{
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(72, 202, 228);
+		}
+		html,body{
+			width: 100%;
+			height: 100%;
+			margin:0;
+		}
+		.input_field{
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(71, 176, 195);
+		}
+		@media screen and (max-width: 800px) {
+			.row{flex-direction: row}
+		}
+		select{width: 45%}
+		#data_submit{
+			padding: 10px;
+			width: 100%;
+			background-color: rgb(72, 202, 228);
+		}
+	</style>
+</head>
+<body>
+<div class="row" >
+	<div class="column left" style="background-color:#00B4D8;">
+		<h2>Remote</h2>
+		<!--toggles-->
+		<h4 hidden id="toggles_head" style="text-decoration: underline">Constants</h4>
+		<form id="toggle_form" action="" method="post">
+			<div id="toggles-box"></div>
+			<input hidden id="toggle" type="text" value="{toggles}">
+		</form>
+		<!--fields-->
+		<h4 hidden id="data_head" style="text-decoration: underline">Data message</h4>
+		<form action="" method="post">
+			<div id="fields-box"></div>
+			<input hidden id="field" type="text" value="{fields}">
+			<input hidden id="last" type="text" value="{last}">
+			<br>
+			<input hidden id="data_submit" type="submit" value="Send data message">
+		</form>
+	</div>
+	<div class="column middle" style="background-color:#0096C7;">
+		<h2>Edit</h2>
+
+		<h4 style="text-decoration: underline">Constants</h4>
+		<ul id="toggle-list"></ul>
+		<!--toggles setup-->
+		<form action="" method="post">
+			<input id="add_toggle" class="input_field" type="text" name="add_toggle" autocomplete="off">
+			<input type="submit" value="Add constant">
+		</form>
+
+		<h4 style="text-decoration: underline">Data message fields</h4>
+		<ul id="field-list"></ul>
+		<!--fields setup-->
+		<form action="" method="post">
+			<input id="add_field" class="input_field" type="text" name="add_field" autocomplete="off">
+			<input type="submit" value="Add field">
+		</form>
+
+	</div>
+	<div class="column right" style="background-color:#0077B6;">
+		<h2>Setup</h2>
+		<!--base message send-->
+		<form action="" method="post">
+			<button class="button" name="base" value="1">Send base data message</button>
+		</form>
+		<a href="/base">
+			<button class="button">Setup base data message</button>
+		</a>
+		<br><br>
+		<!--wifi-->
+		<h4 style="text-decoration: underline">Wi-fi</h4>
+		<form action="" method="post">
+			<label>WiFi name
+				<input class="input_field" type="text" name="wifi_ssid" autocomplete="off">
+			</label>
+			<br><br>
+			<label>WiFi password
+				<input class="input_field" type="password" name="wifi_pass" autocomplete="off">
+			</label>
+			<br><br>
+			<input type="submit" value="Set WiFi details">
+		</form>
+
+		<!--credentials-->
+		<h4 style="text-decoration: underline">Credentials</h4>
+		<form action="" method="post">
+			<label>username
+				<input class="input_field" type="text" name="username" autocomplete="off">
+			</label>
+			<br><br>
+			<label>password
+				<input class="input_field" type="password" name="password" autocomplete="off">
+			</label>
+			<br><br>
+			<input type="submit" value="Set login credentials">
+		</form>
+		<br><br>
+		<a href="/login?disconnect=1">
+			<button class="button">Log out</button>
+		</a>
+	</div>
+</div>
+<div class="alert">
+<h5 style="margin:2px" id="alert_text">%s</h5>
+	<i style="margin-left: auto;padding: 5px" onclick="this.parentElement.display = 'none;'" >&#x2716;</i>
+</div>
+</body>
+<script>
+	const alert_text = document.getElementById("alert_text")
+	if (alert_text.innerText !== ""){
+		alert_text.parentElement.style.display = "flex";
+	}
+	// fields
+
+	const toggle_list = document.getElementById("toggle-list")
+	const field_list = document.getElementById("field-list")
+	const last_options = document.getElementById("last").value.split(",")
+	const field = document.getElementById("field")
+	const fields = field.value.split(";")
+	const fields_form = document.getElementById("fields-box")
+	let options = []
+	if (fields[0] !== "") {
+		for (let i = 0; i < fields.length; i++) {
+			options = fields[i].split(",")
+			field_list.appendChild(CreateListItem(options[0],false))
+			if (options.length >= 3) {
+				document.getElementById("data_submit").hidden = false
+				document.getElementById("data_head").hidden = false
+				let new_select = document.createElement("select")
+				let new_label = document.createElement("label")
+				new_label.htmlFor = options[0]
+				new_label.innerText = options[0]
+				new_select.id = options[0]
+				new_select.name = options[0]
+				new_select.style.display = "block"
+				for (let j = 1; j < options.length; j++) {
+					let new_option = document.createElement("option")
+					new_option.value = options[j]
+					new_option.innerText = options[j]
+					if (j === parseInt(last_options[i])+1) {
+						new_option.selected = true
+					}
+					new_select.options.add(new_option)
+				}
+				fields_form.appendChild(new_label)
+				fields_form.appendChild(new_select)
+			}
+		}
+	}
+	function CreateListItem(field_name,toggle) {
+		const li = document.createElement('li')
+		li.id = field_name;
+		const p = document.createElement("p")
+		const edit_button = document.createElement("button")
+		const remove_button = document.createElement("button")
+		const form = document.createElement("form")
+		p.innerText = field_name
+		edit_button.innerText = "Edit"
+		remove_button.innerText = "Remove"
+		remove_button.value = field_name
+		remove_button.name = "remove_field"
+		form.method = "post"
+		li.appendChild(p)
+
+		if(toggle===false){
+			const edit_anchor = document.createElement("a")
+			edit_anchor.href = `javascript:window.open("/edit_field?field=${field_name}", "_self")`
+			edit_anchor.appendChild(edit_button)
+			li.appendChild(edit_anchor)
+
+		}
+		else{
+			form.classList = "toggle-form"
+			edit_button.name= "add_toggle"
+			edit_button.value= field_name
+			form.appendChild(edit_button)
+			remove_button.name = "remove_toggle"
+
+		}
+		form.appendChild(remove_button)
+		li.appendChild(form)
+		return li
+	}
+
+	// toggles
+	const toggle = document.getElementById("toggle")
+	const toggles = toggle.value.split(",")
+	const toggles_form = document.getElementById("toggles-box")
+	if (toggles[0] !== "") {
+		document.getElementById("toggles_head").hidden = false
+		for (let i = 0; i < toggles.length; i++) {
+			toggle_list.appendChild(CreateListItem(toggles[i],true))
+			let new_toggle = document.createElement("button")
+			new_toggle.type = "submit"
+			new_toggle.name = "toggle"
+			new_toggle.innerText = toggles[i]
+			new_toggle.value = toggles[i]
+			new_toggle.style.display = "block"
+			toggles_form.appendChild(new_toggle)
+		}
+	}
+</script>
+</html>

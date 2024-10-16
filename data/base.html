@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<script>
+	if ( window.history.replaceState ) {
+		window.history.replaceState( null, null, window.location.href );
+	}
+</script>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ac remote-Setup base message</title>
+    <style>
+        body {
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>press the button and then send an example message with the remote, try and get the highest possible length.</h1>
+    <form id="buttonForm" action="/base" method="POST">
+        <button class="button" name="action" value="record">Record base data message</button>
+    </form>
+    <br>
+    <form id="buttonForm2" action="/base" method="POST">
+        <button class="button" name="action" value="reset">Reset remote</button>
+    </form>
+	<br>
+	<a href="/remote">
+		<button>Back to remote</button>
+	</a>
+    <h2>%s</h2>
+</body>
+</html>
