@@ -102,6 +102,7 @@ void writeString(File file, String content) {
 }
 
 void readString(File file, String& data, char terminator) {
+    data = "";
     char c = static_cast<char>(file.read());
     while (c != terminator) {
         data += c;
@@ -250,4 +251,25 @@ Mem* readMem(String path) {
 
     file.close();
     return mem;
+}
+
+void loadMem(Mem*& mem, String path) {
+    if (!LittleFS.exists(path)) {
+        Serial.println("creating mem");
+        mem = new Mem;
+        mem->error_us = 300;
+        mem->base_message = vector<int>();
+        mem->low_ranges = vector<int>();
+        mem->high_ranges = vector<int>();
+        mem->toggle_names = vector<String>();
+        mem->field_names = vector<vector<String>>();
+        mem->toggles = vector<vector<int>>();
+        mem->fields = vector<vector<vector<int>>>();
+        mem->rules = vector<vector<vector<String>>>();
+        writeMem(path, mem);
+    }
+    else {
+        Serial.println("mem already exists");
+        mem = readMem(path);
+    }
 }

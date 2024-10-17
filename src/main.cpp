@@ -11,6 +11,7 @@ void handleLogin();
 void handleBase();
 void handleRemote();
 void handleEditField();
+void handleProfiles();
 void handleNotFound();
 
 constexpr int led_pin = LED_BUILTIN;
@@ -27,7 +28,7 @@ String g_wifi_ssid;
 String g_wifi_pass;
 String g_username;
 String g_password;
-vector<String> profiles = vector<String>();
+vector<String> g_profiles;
 String g_memPath;
 
 void setup() {
@@ -58,32 +59,18 @@ void setup() {
     Serial.print(g_wifi_pass);
     Serial.println(".");
 
+    g_profiles = vector<String>();
     f = LittleFS.open("/profiles.txt", "r");
+    String line;
     while (f.available()) {
-        profiles.push_back(f.readStringUntil('\n'));
+        readString(f, line, '\n');
+        g_profiles.push_back(line);
     }
     f.close();
-    g_memPath = profiles[0] + ".mem";
 
-    if (!LittleFS.exists(g_memPath)) {
-        g_mem = new Mem;
-        g_mem->error_us = 300;
-        g_mem->base_message = vector<int>();
-        g_mem->low_ranges = vector<int>();
-        g_mem->high_ranges = vector<int>();
-        g_mem->toggle_names = vector<String>();
-        g_mem->field_names = vector<vector<String>>();
-        g_mem->toggles = vector<vector<int>>();
-        g_mem->fields = vector<vector<vector<int>>>();
-        g_mem->rules = vector<vector<vector<String>>>();
-        Serial.println("creating mem");
-        writeMem(g_memPath, g_mem);
-    }
-    else {
-        Serial.println("mem already exists");
-        // dumpFile(profile+".mem");
-        g_mem = readMem(g_memPath);
-    }
+    g_memPath = g_profiles[0] + ".mem";
+
+    loadMem(g_mem, g_memPath);
 
     // web server setup
     startWIFI(g_wifi_ssid, g_wifi_pass);
@@ -94,6 +81,7 @@ void setup() {
     server.on("/base", handleBase);
     server.on("/remote", handleRemote);
     server.on("/edit_field", handleEditField);
+    server.on("/profiles", handleProfiles);
     server.onNotFound(handleNotFound);
     server.begin();
     digitalWrite(led_pin, HIGH);
@@ -251,6 +239,30 @@ void handleEditField() {
         server.sendHeader("Location", "/login");
         server.send(302);
     }
+}
+
+void handleProfiles() {
+    if (checkAuth(server)) {
+        if (server.method() == HTTP_POST) {
+            if (server.hasArg("profile")) {
+                profilesSet(server, g_mem, g_profiles);
+                g_memPath = g_profiles[0] + ".mem";
+
+            } else if (server.hasArg("add_profile")) {
+                profilesAdd(server, g_profiles);
+
+            } else if (server.hasArg("remove_profile")) {
+                profilesRemove(server, g_mem, g_profiles);
+                g_memPath = g_profiles[0] + ".mem";
+            }
+        } else {
+            profilesShow(server, g_profiles, "");
+        }
+    } else {
+        server.sendHeader("Location", "/login");
+        server.send(302);
+    }
+
 }
 
 void handleNotFound() {

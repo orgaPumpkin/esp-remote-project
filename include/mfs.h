@@ -31,5 +31,6 @@ vector<int> readVector(File file);
 void readString(File file, String& data, char terminator);
 void writeMem(String path, Mem* mem);
 Mem* readMem(String path);
+void loadMem(Mem*& mem, String path);
 
 #endif //MFS_H

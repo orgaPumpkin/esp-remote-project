@@ -63,6 +63,7 @@ void removeAuth(String cookie) {
     }
 }
 
+
 //led
 void ledPage(ESP8266WebServer& server,String& led_state, int led) {
     if (server.method() == HTTP_POST && server.hasArg("led")) {
@@ -79,6 +80,7 @@ void ledPage(ESP8266WebServer& server,String& led_state, int led) {
     html.replace("%s", led_state);
     server.send(200, "text/html", html);
 }
+
 
 // login
 void loginDisconnect(ESP8266WebServer& server) {
@@ -158,8 +160,9 @@ void baseReset(ESP8266WebServer& server, Mem* mem) {
     server.send(200, "text/html", html);
 }
 
+
 // remote
-void remote(ESP8266WebServer& server, Mem* mem, const char* message) {
+void remote(ESP8266WebServer& server, Mem* mem, const String& message) {
     String html = "";
     readFile("/remote.html", &html);
     html.replace("%s", message);
@@ -304,6 +307,7 @@ void remoteSendData(ESP8266WebServer& server, Mem* mem, int ir) {
     remote(server, mem, "sent data message.");
 }
 
+
 // edit field
 void editField(ESP8266WebServer& server, Mem* mem, String message) {
     String html = "";
@@ -431,4 +435,94 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
         editField(server, mem, "invalid option");
     }
 }
+
+// profiles
+void profilesShow(ESP8266WebServer& server, vector<String>& profiles, const String& message) {
+    String html = "";
+    readFile("/profiles.html", &html);
+    html.replace("%s", message);
+
+    String profilesStr = "";
+    for (String profile : profiles) {
+        Serial.println(profile);
+        profilesStr += profile + ",";
+    }
+    if (profilesStr.length() >= 1) {
+        profilesStr.remove(profilesStr.length() - 1);
+    }
+    html.replace("{profiles}", profilesStr);
+    server.send(200, "text/html", html);
+
+}
+
+
+void profilesSet(ESP8266WebServer& server, Mem*& mem, vector<String>& profiles) {
+    int found = -1;
+    for (unsigned int i = 0; i < profiles.size() && found == -1; i++) {
+        Serial.println(profiles[i]);
+        if (profiles[i] == server.arg("profile")) {
+            found = i;
+        }
+    }
+    if (found != -1) {
+        profiles.erase(profiles.begin() + found);
+        profiles.insert(profiles.begin(), server.arg("profile"));
+
+        loadMem(mem, server.arg("profile")+".mem");
+
+        File f = LittleFS.open("/profiles.txt", "w");
+        for (String line : profiles) {
+            f.print(line + '\n');
+        }
+
+        profilesShow(server, profiles, "switched profile.");
+    } else {
+        profilesShow(server, profiles, "profile not found");
+    }
+}
+
+void profilesAdd(ESP8266WebServer& server, vector<String>& profiles) {
+    if (count(profiles.begin(), profiles.end(), server.arg("add_profile")) == 0) {
+        profiles.push_back(server.arg("add_profile"));
+
+        File f = LittleFS.open("/profiles.txt", "w");
+        for (String line : profiles) {
+            f.print(line + '\n');
+        }
+
+        profilesShow(server, profiles, "added profile.");
+    } else {
+        profilesShow(server, profiles, "profile already exists.");
+    }
+}
+
+void profilesRemove(ESP8266WebServer& server, Mem*& mem, vector<String>& profiles) {
+    if (profiles.size() > 1) {
+        int found = -1;
+        for (unsigned int i = 0; i < profiles.size() && found == -1; i++) {
+            Serial.println(profiles[i]);
+            if (profiles[i] == server.arg("remove_profile")) {
+                found = i;
+            }
+        }
+
+        if (found != -1) {
+            profiles.erase(profiles.begin() + found);
+
+            File f = LittleFS.open("/profiles.txt", "w");
+            for (String line : profiles) {
+                f.print(line + '\n');
+            }
+
+            loadMem(mem, profiles[0]+".mem");
+
+            profilesShow(server, profiles, "removed profile.");
+        } else {
+            profilesShow(server, profiles, "profile not found");
+        }
+    } else {
+        profilesShow(server, profiles, "can't delete last profile");
+    }
+}
+
 
