@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "dataMessage.h"
 
-void startWIFI(Mem* mem);
+void startWIFI(String& ssid, String& pass);
 bool checkAuth(ESP8266WebServer &server);
 void addAuth(String* logid);
 void removeAuth(String cookie);
@@ -15,15 +15,15 @@ void ledPage(ESP8266WebServer& server,String& led_state, int led);
 
 void loginDisconnect(ESP8266WebServer& server);
 void loginConnected(ESP8266WebServer& server);
-void loginLogin(ESP8266WebServer& server, Mem* mem);
+void loginLogin(ESP8266WebServer& server, String username, String password);
 
 void baseRecord(ESP8266WebServer& server, Mem* mem, int sensor, int led);
 void baseReset(ESP8266WebServer& server, Mem* mem);
 
 void remote(ESP8266WebServer& server, Mem* mem, const char* message);
 void remoteBase(ESP8266WebServer& server, Mem* mem, int ir);
-void remoteWifi(ESP8266WebServer& server, Mem* mem);
-void remoteEditUser(ESP8266WebServer& server, Mem* mem);
+void remoteWifi(ESP8266WebServer& server, Mem* mem, String& ssid, String& pass);
+void remoteEditUser(ESP8266WebServer& server, Mem* mem, String& username, String& password);
 
 void remoteAddToggle(ESP8266WebServer& server, Mem* mem, int sensor, int led);
 void remoteRemoveToggle(ESP8266WebServer& server, Mem* mem);

@@ -10,10 +10,6 @@ using namespace std;
 
 typedef struct Mem {
     int error_us;
-    String wifi_ssid;
-    String wifi_pass;
-    String username;
-    String password;
     vector<int> base_message;
     vector<int> low_ranges;
     vector<int> high_ranges;
@@ -32,7 +28,8 @@ void dumpFile(const char* path);
 void writeFile(const char *path, String content);
 void writeVector(File file, vector<int>* vec);
 vector<int> readVector(File file);
-void writeMem(const char* path, Mem* mem);
-Mem* readMem(const char* path);
+void readString(File file, String& data, char terminator);
+void writeMem(String path, Mem* mem);
+Mem* readMem(String path);
 
 #endif //MFS_H

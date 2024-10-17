@@ -101,16 +101,16 @@ void writeString(File file, String content) {
     file.write(0);
 }
 
-void readString(File file, String* data) {
+void readString(File file, String& data, char terminator) {
     char c = static_cast<char>(file.read());
-    while (c) {
-        *data += c;
+    while (c != terminator) {
+        data += c;
         c = static_cast<char>(file.read());
     }
 }
 
 
-void writeMem(const char* path, Mem* mem) {
+void writeMem(String path, Mem* mem) {
     Serial.println("Writing mem");
     delay(1000);
     File file = LittleFS.open(path, "w");
@@ -119,12 +119,6 @@ void writeMem(const char* path, Mem* mem) {
         return;
     }
     writeInt(file, mem->error_us);
-
-    writeString(file, mem->wifi_ssid);
-    writeString(file, mem->wifi_pass);
-    writeString(file, mem->username);
-    writeString(file, mem->password);
-    // Serial.println("wrote strings");
 
     writeVector(file, &mem->base_message);
     writeVector(file, &mem->low_ranges);
@@ -182,7 +176,7 @@ void writeMem(const char* path, Mem* mem) {
     file.close();
 }
 
-Mem* readMem(const char* path) {
+Mem* readMem(String path) {
     File file = LittleFS.open(path, "r");
     if (!file) {
         Serial.println("Failed to open file for writing");
@@ -192,16 +186,6 @@ Mem* readMem(const char* path) {
     file.readBytes(reinterpret_cast<char *>(&mem->error_us), sizeof(int));
     // Serial.println("read error_us");
 
-    mem->wifi_ssid = "";
-    readString(file, &mem->wifi_ssid);
-    mem->wifi_pass = "";
-    readString(file, &mem->wifi_pass);
-    mem->username = "";
-    readString(file, &mem->username);
-    mem->password = "";
-    readString(file, &mem->password);
-
-    // Serial.println("read strings");
     mem->base_message = readVector(file);
     mem->low_ranges = readVector(file);
     mem->high_ranges = readVector(file);
@@ -212,11 +196,7 @@ Mem* readMem(const char* path) {
     file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
     mem->toggle_names = vector<String>(count, "");
     for (size_t i = 0; i < count; i++) {
-        char c = static_cast<char>(file.read());
-        while (c) {
-            mem->toggle_names[i] += c;
-            c = static_cast<char>(file.read());
-        }
+        readString(file, mem->toggle_names[i], '\0');
     }
     // Serial.println("read toggle names");
     // read string vector vector
@@ -227,11 +207,7 @@ Mem* readMem(const char* path) {
         file.readBytes(reinterpret_cast<char *>(&count2), sizeof(int));
         mem->field_names[i] = vector<String>(count2, "");
         for (size_t j = 0; j < count2; j++) {
-            char c = static_cast<char>(file.read());
-            while (c) {
-                mem->field_names[i][j] += c;
-                c = static_cast<char>(file.read());
-            }
+            readString(file, mem->field_names[i][j], '\0');
         }
     }
     // Serial.println("read field names");
@@ -243,7 +219,7 @@ Mem* readMem(const char* path) {
     }
     // Serial.println("read toggles");
 
-    // read int vector vector vector
+    // read string vector vector vector
     size_t count3;
     file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
     mem->rules = vector<vector<vector<String>>>(count);
@@ -254,11 +230,7 @@ Mem* readMem(const char* path) {
             file.readBytes(reinterpret_cast<char *>(&count3), sizeof(int));
             mem->rules[i][j] = vector<String>(count3, "");
             for (size_t k = 0; k < count3; k++) {
-                char c = static_cast<char>(file.read());
-                while (c) {
-                    mem->rules[i][j][k] += c;
-                    c = static_cast<char>(file.read());
-                }
+                readString(file, mem->rules[i][j][k], '\0');
             }
         }
     }
