@@ -49,6 +49,7 @@
 		}
 		.button_container{
 			display: flex;
+			gap: 5px;
 			margin-bottom: 5px;
 		}
 		.message:empty{
@@ -79,18 +80,18 @@
 <h1>{field}</h1>
 <h2>{disable_fields}</h2>
 <form action="" method="post">
-	<input id="add_option" type="text" name="add_option" autocomplete="off">
+	<label for="add_option"></label><input id="add_option" type="text" name="add_option" autocomplete="off">
 	<input type="submit" value="Add option">
 </form>
 <form action="" method="post">
-	<input id="remove_option" type="text" name="remove_option" autocomplete="off">
+	<label for="remove_option"></label><input id="remove_option" type="text" name="remove_option" autocomplete="off">
 	<input type="submit" value="Remove option">
 </form>
 <h3 id="text" hidden>Edit options:</h3>
 <form id="options_form" action="" method="post">
 	<div id="options-box"></div>
-	<input hidden id="disable_options" type="text" value="{disable_fields}">
-	<input hidden id="options" type="text" value="test,hello;">
+	<label for="disable_options"></label><input hidden id="disable_options" type="text" value="{disable_fields}">
+	<label for="options"></label><input hidden id="options" type="text" value="{options}">
 </form>
 <a href="/remote">
 	<button>Back to remote</button>
@@ -132,7 +133,7 @@
 		let submit_button = document.createElement("button")
 		form.classList.add("multiselect")
 		submit_button.type = "submit"
-		submit_button.innerText = "Update"
+		submit_button.innerText = "Disable Fields"
 		new_select.name = "field"
 		new_select.multiple = "true"
 		for (let i = 0; i < disabled_options.length; i++) {
