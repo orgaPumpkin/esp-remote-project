@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <script>
-	if ( window.history.replaceState ) {
-		window.history.replaceState( null, null, window.location.href );
-	}
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
 </script>
 <html>
 <head>
@@ -10,31 +10,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ac remote-Setup base message</title>
     <style>
+        body *{
+            font-family: Helvetica,sans-serif;
+        }
         body {
-            justify-content: center;
-            align-items: center;
             margin: 0;
         }
-        button {
-            padding: 15px 30px;
-            font-size: 20px;
-            cursor: pointer;
+        body *{
+            font-family: Helvetica,sans-serif;
+        }
+        body{
+            background-color: #0077B6;
+        }
+        .container{
+            border: 2px solid #0096C7;
+            background-color: #f3f3f3;
+            width: fit-content;
+            margin: 15px auto;
+            padding: 25px;
+        }
+
+        button{
+            padding: 25px 15px;
+            border: 1px solid #0096C7;
+            border-radius: 5px;
+            background-color: #00B4D8;
+            color: #f3f3f3;
+            font-size: large;
+        }
+        button:hover{
+            background-color: #0077B6;
+        }
+        .message:empty{
+            display:none
+        }
+        .message{
+            width: 100%;
+            background-color: rgba(60, 179, 113, 0.76);
+            border: 2px solid mediumseagreen;
+            padding: 5px;
+            border-radius: 5px;
+            color: #fefefe;
+        }
+        .back-button{
+            position: absolute;
+            bottom: 0;
+            background-color: indianred !important;
+            border:none;
+
+        }
+        a,.back-button:hover{
+            background-color: darkred !important;
         }
     </style>
 </head>
 <body>
-    <h1>press the button and then send an example message with the remote, try and get the highest possible length.</h1>
-    <form id="buttonForm" action="/base" method="POST">
-        <button class="button" name="action" value="record">Record base data message</button>
-    </form>
+<div class="container">
+    <h2 class="message">%s</h2>
+    <h1>press the button and send an example message with your remote,</h1>
+    <h1>get the highest possible length.</h1>
+    <div class="buttons-containers">
+        <form id="buttonForm" action="/base" method="POST">
+            <button class="button" name="action" value="record">Record base data message</button>
+            <button class="button" name="action" value="reset">Reset remote</button>
+        </form>
+    </div>
     <br>
-    <form id="buttonForm2" action="/base" method="POST">
-        <button class="button" name="action" value="reset">Reset remote</button>
-    </form>
-	<br>
-	<a href="/remote">
-		<button>Back to remote</button>
-	</a>
-    <h2>%s</h2>
+</div>
+<a  href="/remote">
+    <button class="back-button">Back to remote</button>
+</a>
+
+
 </body>
 </html>

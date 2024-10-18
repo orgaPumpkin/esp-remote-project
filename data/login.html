@@ -1,11 +1,55 @@
 <html>
-    <head>
-        <meta name='viewport' content='width=device-width, initial-scale=1' /><TITLE>login to orga's ac remote</TITLE>
-    </head>
-    <body>
-        <form action='/login' method='POST'>To log in, please enter your username and password<br><br>
-        <input type='text' name='username' placeholder='user name'><br><br>
-        <input type='password' name='password' placeholder='password'><br><br>
-        <input type='submit' name='submit' value='Submit'></form>%s<br><br>
-    </body>
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1'/><TITLE>login to orga's ac remote</TITLE>
+    <style>
+        body *{
+            font-family: Helvetica,sans-serif;
+        }
+        body{
+            background-color: #0077B6;
+        }
+        .login-container{
+            border: 2px solid #0096C7;
+            background-color: #f3f3f3;
+            width: fit-content;
+            margin: auto;
+            padding: 25px;
+        }
+        input{
+            padding: 5px;
+            border: 1px solid #0096C7;
+            border-radius: 5px;
+        }
+        input[type=text],input[type=password]{
+            background-color: #fefefe;
+        }
+        input[type=submit]{
+            background-color: #00B4D8;
+            color: #f3f3f3;
+        }
+        input[type=submit]:hover{
+            background-color: #0077B6;
+        }
+        .message:empty{
+            display:none
+        }
+        .message{
+            width: 100%;
+            background-color: rgba(205, 92, 92, 0.69);
+            border: 2px solid indianred;
+            padding: 5px;
+            border-radius: 5px;
+            color: #fefefe;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <p class="message">%s</p>
+    <form action='/login' method='POST'>To Log-in, Please Insert you credentials<br><br>
+        <input type='text' name='username' placeholder='Username'><br><br>
+        <input type='password' name='password' placeholder='Password'><br><br>
+        <input type='submit' name='submit' value='Submit'></form>
+</div>
+</body>
 </html>
