@@ -71,18 +71,28 @@ void writeFile(const char* path, String content) {
     file.close();
 }
 
-void writeInt(File file, int x) {
-    char* intc = reinterpret_cast<char *>(&x);
-    for (unsigned int i = 0; i < sizeof(int); i++) {
-        file.write(intc[i]);
+
+
+void writeBytes(File& file, char* x, const size_t size) {
+    for (unsigned int i = 0; i < size; i++) {
+        file.write(x[i]);
     }
 }
+void writeBytes(File& file, int x) {
+    writeBytes(file, reinterpret_cast<char *>(&x), sizeof(int));
+}
 
-void writeVector(File file, vector<int>* vec) {
-    int count = vec->size();
-    writeInt(file, count);
+void writeVector(File file, vector<int>& vec) {
+    size_t count = vec.size();
+    writeBytes(file, count);
     if (count > 0) {
-        file.write(reinterpret_cast<const char*>(&((*vec)[0])), vec->size()*sizeof(int));
+        file.write(reinterpret_cast<const char*>(&(vec[0])), vec.size()*sizeof(int));
+    }
+}
+void writeVector2(File file, vector<vector<int>>& vec) {
+    writeBytes(file, vec.size());
+    for (vector<int> intVec : vec) {
+        writeVector(file, intVec);
     }
 }
 
@@ -95,10 +105,37 @@ vector<int> readVector(File file) {
     }
     return vec;
 }
+vector<vector<int>> readVector2(File file) {
+    size_t count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    vector<vector<int>> vec = vector<vector<int>>(count);
+    for (size_t i = 0; i < count; i++) {
+        vec[i] = readVector(file);
+    }
+    return vec;
+}
 
 void writeString(File file, String content) {
     file.print(content);
     file.write(0);
+}
+void writeStringVector(File& file, vector<String>& vec) {
+    writeBytes(file, vec.size());
+    for (String string : vec) {
+        writeString(file, string);
+    }
+}
+void writeStringVector2(File& file, vector<vector<String>>& vec) {
+    writeBytes(file, vec.size());
+    for (vector<String> str_vector : vec) {
+        writeStringVector(file, str_vector);
+    }
+}
+void writeStringVector3(File& file, vector<vector<vector<String>>>& vec) {
+    writeBytes(file, vec.size());
+    for (vector<vector<String>> str_vector2 : vec) {
+        writeStringVector2(file, str_vector2);
+    }
 }
 
 void readString(File file, String& data, char terminator) {
@@ -109,6 +146,31 @@ void readString(File file, String& data, char terminator) {
         c = static_cast<char>(file.read());
     }
 }
+void readStringVector(File file, vector<String>& data, char terminator) {
+    size_t count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    data = vector<String>(count, "");
+    for (size_t i = 0; i < count; i++) {
+        readString(file, data[i], terminator);
+    }
+}
+void readStringVector2(File file, vector<vector<String>>& data, char terminator) {
+    size_t count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    data = vector<vector<String>>(count);
+    for (size_t i = 0; i < count; i++) {
+        readStringVector(file, data[i], terminator);
+    }
+}
+void readStringVector3(File file, vector<vector<vector<String>>>& data, char terminator) {
+    size_t count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    data = vector<vector<vector<String>>>(count);
+    for (size_t i = 0; i < count; i++) {
+        readStringVector2(file, data[i], terminator);
+    }
+}
+
 
 
 void writeMem(String path, Mem* mem) {
@@ -119,58 +181,30 @@ void writeMem(String path, Mem* mem) {
         Serial.println("Failed to open file for writing");
         return;
     }
-    writeInt(file, mem->error_us);
+    writeBytes(file, reinterpret_cast<char *>(&mem->error_us), sizeof(mem->error_us));
 
-    writeVector(file, &mem->base_message);
-    writeVector(file, &mem->low_ranges);
-    writeVector(file, &mem->high_ranges);
-    writeVector(file, &mem->high_ranges);
+    writeVector(file, mem->base_message);
+    writeVector(file, mem->low_ranges);
+    writeVector(file, mem->high_ranges);
+    writeVector(file, mem->high_ranges);
     // Serial.println("wrote normal vectors");
 
-    // write string vector
-    writeInt(file, mem->toggle_names.size());
-    for (String toggle_name : mem->toggle_names) {
-        writeString(file, toggle_name);
-    }
+    writeStringVector(file, mem->toggle_names);
     // Serial.println("wrote toggle names");
 
-    // write string vector vector
-    writeInt(file, mem->field_names.size());
-    for (vector<String> str_vector : mem->field_names) {
-        writeInt(file, str_vector.size());
-        for (String str : str_vector) {
-            writeString(file, str);
-        }
-    }
+    writeStringVector2(file, mem->field_names);
     // Serial.println("wrote field names");
 
-    // write int vector vector
-    writeInt(file, mem->toggles.size());
-    for (vector<int> toggle : mem->toggles) {
-        writeVector(file, &toggle);
-    }
+    writeVector2(file, mem->toggles);
     // Serial.println("wrote toggles");
 
-    // write string vector vector vector
-    writeInt(file, mem->rules.size());
-    for (vector<vector<String>> field : mem->rules) {
-        writeInt(file, field.size());
-        for (vector<String> option : field) {
-            writeInt(file, option.size());
-            for (String disabled_field : option) {
-                writeString(file, disabled_field);
-            }
-        }
-    }
+    writeStringVector3(file, mem->rules);
     // Serial.println("wrote rules");
 
     // write int vector vector vector
-    writeInt(file, mem->fields.size());
+    writeBytes(file, mem->fields.size());
     for (vector<vector<int>> field : mem->fields) {
-        writeInt(file, field.size());
-        for (vector<int> option : field) {
-            writeVector(file, &option);
-        }
+        writeVector2(file, field);
     }
     // Serial.println("wrote fields");
 
@@ -192,60 +226,25 @@ Mem* readMem(String path) {
     mem->high_ranges = readVector(file);
     mem->last_options = readVector(file);
     // Serial.println("read normal vectors");
-    // read string vector
-    size_t count;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
-    mem->toggle_names = vector<String>(count, "");
-    for (size_t i = 0; i < count; i++) {
-        readString(file, mem->toggle_names[i], '\0');
-    }
+
+    readStringVector(file, mem->toggle_names, '\0');
     // Serial.println("read toggle names");
-    // read string vector vector
-    size_t count2;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
-    mem->field_names = vector<vector<String>>(count);
-    for (size_t i = 0; i < count; i++) {
-        file.readBytes(reinterpret_cast<char *>(&count2), sizeof(int));
-        mem->field_names[i] = vector<String>(count2, "");
-        for (size_t j = 0; j < count2; j++) {
-            readString(file, mem->field_names[i][j], '\0');
-        }
-    }
+
+    readStringVector2(file, mem->field_names, '\0');
     // Serial.println("read field names");
-    // read int vector vector
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
-    mem->toggles = vector<vector<int>>(count);
-    for (size_t i = 0; i < count; i++) {
-        mem->toggles[i] = readVector(file);
-    }
+
+    mem->toggles = readVector2(file);
     // Serial.println("read toggles");
 
-    // read string vector vector vector
-    size_t count3;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
-    mem->rules = vector<vector<vector<String>>>(count);
-    for (size_t i = 0; i < count; i++) {
-        file.readBytes(reinterpret_cast<char *>(&count2), sizeof(int));
-        mem->rules[i] = vector<vector<String>>(count2);
-        for (size_t j = 0; j < count2; j++) {
-            file.readBytes(reinterpret_cast<char *>(&count3), sizeof(int));
-            mem->rules[i][j] = vector<String>(count3, "");
-            for (size_t k = 0; k < count3; k++) {
-                readString(file, mem->rules[i][j][k], '\0');
-            }
-        }
-    }
+    readStringVector3(file, mem->rules, '\0');
     // Serial.println("read rules");
 
     // read int vector vector vector
+    size_t count;
     file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
     mem->fields = vector<vector<vector<int>>>(count);
     for (size_t i = 0; i < count; i++) {
-        file.readBytes(reinterpret_cast<char *>(&count2), sizeof(int));
-        mem->fields[i] = vector<vector<int>>(count2);
-        for (size_t j = 0; j < count2; j++) {
-            mem->fields[i][j] = readVector(file);
-        }
+        mem->fields[i] = readVector2(file);
     }
     // Serial.println("read fields");
 
@@ -267,9 +266,74 @@ void loadMem(Mem*& mem, String path) {
         mem->fields = vector<vector<vector<int>>>();
         mem->rules = vector<vector<vector<String>>>();
         writeMem(path, mem);
-    }
-    else {
+    } else {
         Serial.println("mem already exists");
         mem = readMem(path);
     }
+}
+
+
+void writeSchedule(Schedules* schedules, String path) {
+    File file = LittleFS.open(path, "w");
+    if (!file) {
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+    // data
+    writeBytes(file, schedules->data_schedules.size());
+    for (DataSchedule schedule : schedules->data_schedules) {
+        writeStringVector(file, schedule.field_names);
+        writeStringVector(file, schedule.option_names);
+        writeBytes(file, reinterpret_cast<char *>(schedule.time), sizeof(schedule.time));
+    }
+    // toggles
+    writeBytes(file, schedules->data_schedules.size());
+    for (ToggleSchedule schedule : schedules->toggle_schedules) {
+        writeString(file, schedule.toggle_name);
+        writeBytes(file, reinterpret_cast<char *>(schedule.time), sizeof(schedule.time));
+    }
+    file.close();
+}
+
+Schedules* readSchedules(String path) {
+    Schedules* schedules = new Schedules();
+    File file = LittleFS.open(path, "r");
+    int count, count2;
+
+    // data
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    schedules->data_schedules = vector<DataSchedule>(count);
+    for (int i = 0; i < count; i++) {
+        file.readBytes(reinterpret_cast<char *>(&count2), sizeof(int));
+
+        readStringVector(file, schedules->data_schedules[i].field_names, '\0');
+        readStringVector(file, schedules->data_schedules[i].option_names, '\0');
+        file.readBytes(reinterpret_cast<char *>(&schedules->data_schedules[i].time), sizeof(time_t));
+    }
+
+    // toggles
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    schedules->toggle_schedules = vector<ToggleSchedule>(count);
+    for (int i = 0; i < count; i++) {
+        readString(file, schedules->toggle_schedules[i].toggle_name, '\0');
+        file.readBytes(reinterpret_cast<char *>(&schedules->toggle_schedules[i].time), sizeof(time_t));
+    }
+
+    file.close();
+    return schedules;
+}
+
+void loadSchedules(Schedules*& schedules, String path) {
+    if (!LittleFS.exists(path)) {
+        Serial.println("creating schedules");
+        schedules = new Schedules;
+        schedules->data_schedules = vector<DataSchedule>();
+        schedules->toggle_schedules = vector<ToggleSchedule>();
+
+        writeSchedule(schedules, path);
+    } else {
+        Serial.println("schedules already exists");
+        schedules = readSchedules(path);
+    }
+    Serial.println("schedules loaded");
 }

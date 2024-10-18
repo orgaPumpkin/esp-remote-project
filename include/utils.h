@@ -13,6 +13,7 @@ int findRange(int pulse, bool state, Mem* mem);
 void processMessage(vector<int>& raw_message, vector<int>& message, Mem* mem);
 void sendMessage(vector<int>& message, int pin, Mem* mem);
 int findField(String field, Mem* mem);
+unsigned int findElement(const String &option, vector<String> &vec);
 
 
 #endif //UTILS_H

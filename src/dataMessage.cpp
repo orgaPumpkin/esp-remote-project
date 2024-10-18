@@ -1,10 +1,6 @@
 #include "dataMessage.h"
 
-typedef struct fieldValue {
-    unsigned int fieldI;
-    unsigned int optionI;
-    vector<bool> effected;
-} fieldValue;
+
 
 bool field_sorter(fieldValue const& lhs, fieldValue const& rhs) {
     return count(lhs.effected.begin(), lhs.effected.end(), true) > count(rhs.effected.begin(), rhs.effected.end(), true);
@@ -26,8 +22,7 @@ vector<bool> findEffected(unsigned int fieldI, Mem* mem) {
 }
 
 
-vector<int> buildDataMessage(ESP8266WebServer& server, Mem* mem) {
-    vector<int> message = mem->base_message;
+vector<fieldValue> getFieldsServer(ESP8266WebServer& server, Mem* mem) {
     vector<fieldValue> fields = vector<fieldValue>();
 
     // for arg in request
@@ -39,7 +34,7 @@ vector<int> buildDataMessage(ESP8266WebServer& server, Mem* mem) {
         if (fieldI != -1) { // field exists
             Serial.println("found field");
             String option = server.arg(argName);
-            unsigned int optionI = (find(mem->field_names[fieldI].begin(), mem->field_names[fieldI].end(), option) - mem->field_names[fieldI].begin())-1;
+            unsigned int optionI = findElement(option, mem->field_names[fieldI]);
             if (optionI < mem->fields[fieldI].size()) { // option exists
                 Serial.println("found option");
                 fields.emplace_back();
@@ -51,10 +46,17 @@ vector<int> buildDataMessage(ESP8266WebServer& server, Mem* mem) {
         }
     }
 
+    return fields;
+}
+
+
+vector<int> buildDataMessage(vector<fieldValue> fields, Mem* mem) {
+
     // sort the fields from biggest to smallest
     sort(fields.begin(), fields.end(), field_sorter);
 
     // build message
+    vector<int> message = mem->base_message;
     vector<String> disabled = vector<String>();
     for (fieldValue field : fields) {
         // check disabled

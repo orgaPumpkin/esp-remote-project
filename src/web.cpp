@@ -143,7 +143,7 @@ void baseRecord(ESP8266WebServer& server, Mem* mem, int sensor, int led) {
     }
 }
 
-void baseReset(ESP8266WebServer& server, Mem* mem) {
+void baseReset(ESP8266WebServer& server, Mem* mem, Schedules* schedules) {
     mem->low_ranges.clear();
     mem->high_ranges.clear();
     mem->base_message.clear();
@@ -153,6 +153,9 @@ void baseReset(ESP8266WebServer& server, Mem* mem) {
     mem->toggles.clear();
     mem->error_us = 300;
     mem->rules.clear();
+
+    schedules->data_schedules.clear();
+    schedules->toggle_schedules.clear();
 
     String html = "";
     readFile("/base.html", &html);
@@ -287,7 +290,7 @@ void remoteRemoveField(ESP8266WebServer& server, Mem* mem) {
 }
 
 void remoteToggle(ESP8266WebServer& server, Mem* mem, int ir) {
-    unsigned int  toggleI = distance(mem->toggle_names.begin(), find(mem->toggle_names.begin(), mem->toggle_names.end(), server.arg("toggle")));
+    unsigned int toggleI = findElement(server.arg("toggle"), mem->toggle_names);
 
     if (toggleI < mem->toggle_names.size()) {   // toggle exists
         sendMessage(mem->toggles[toggleI], ir, mem);
@@ -298,7 +301,8 @@ void remoteToggle(ESP8266WebServer& server, Mem* mem, int ir) {
 }
 
 void remoteSendData(ESP8266WebServer& server, Mem* mem, int ir) {
-    vector<int> message = buildDataMessage(server, mem);
+    vector<fieldValue> fields = getFieldsServer(server, mem);
+    vector<int> message = buildDataMessage(fields, mem);
     for (int pulse : message) {
         Serial.print(pulse);
     }
@@ -362,7 +366,7 @@ void editFieldAddOption(ESP8266WebServer& server, Mem* mem, int sensor, int led)
     if (getMessage(raw_message, sensor, led)) {  // if got a message
         if (raw_message.size() == mem->base_message.size()) {
             int fieldI = findField(server.arg("field"), mem);
-            unsigned int optionI = distance(mem->field_names[fieldI].begin(), find(++mem->field_names[fieldI].begin(), mem->field_names[fieldI].end(), server.arg("add_option")))-1;
+            unsigned int optionI = findElement(server.arg("add_option"), mem->field_names[fieldI])-1;
             Serial.println("optionI = " + String(optionI));
             // if option doesn't already exist, create
             if (optionI >= mem->field_names[fieldI].size()-1) {
@@ -390,7 +394,7 @@ void editFieldRemoveOption(ESP8266WebServer& server, Mem* mem) {
 
     int fieldI = findField(server.arg("field"), mem);
     Serial.println(server.arg("remove_option"));
-    unsigned int optionI = (find(mem->field_names[fieldI].begin(), mem->field_names[fieldI].end(), server.arg("remove_option")) - mem->field_names[fieldI].begin())-1;
+    unsigned int optionI = findElement(server.arg("remove_option"), mem->field_names[fieldI])-1;
     Serial.println("optionI = " + String(optionI));
     if (optionI < mem->fields[fieldI].size()) { // if option exists, remove option
         mem->field_names[fieldI].erase(mem->field_names[fieldI].begin() + optionI+1);
@@ -405,7 +409,7 @@ void editFieldRemoveOption(ESP8266WebServer& server, Mem* mem) {
 
 void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
     int fieldI = findField(server.arg("field"), mem);
-    unsigned int optionI = (find(mem->field_names[fieldI].begin(), mem->field_names[fieldI].end(), server.arg("option")) - mem->field_names[fieldI].begin())-1;
+    unsigned int optionI = findElement(server.arg("option"), mem->field_names[fieldI])-1;
     Serial.println("optionI = " + String(optionI));
     if (optionI < mem->fields[fieldI].size()) {
         // get disabled fields
@@ -456,7 +460,7 @@ void profilesShow(ESP8266WebServer& server, vector<String>& profiles, const Stri
 }
 
 
-void profilesSet(ESP8266WebServer& server, Mem*& mem, vector<String>& profiles) {
+void profilesSet(ESP8266WebServer& server, Mem*& mem, Schedules*& schedules, vector<String>& profiles) {
     int found = -1;
     for (unsigned int i = 0; i < profiles.size() && found == -1; i++) {
         Serial.println(profiles[i]);
@@ -469,6 +473,7 @@ void profilesSet(ESP8266WebServer& server, Mem*& mem, vector<String>& profiles) 
         profiles.insert(profiles.begin(), server.arg("profile"));
 
         loadMem(mem, server.arg("profile")+".mem");
+        loadSchedules(schedules, server.arg("profile")+".sch");
 
         File f = LittleFS.open("/profiles.txt", "w");
         for (String line : profiles) {
@@ -496,7 +501,7 @@ void profilesAdd(ESP8266WebServer& server, vector<String>& profiles) {
     }
 }
 
-void profilesRemove(ESP8266WebServer& server, Mem*& mem, vector<String>& profiles) {
+void profilesRemove(ESP8266WebServer& server, Mem*& mem, Schedules*& schedules, vector<String>& profiles) {
     if (profiles.size() > 1) {
         int found = -1;
         for (unsigned int i = 0; i < profiles.size() && found == -1; i++) {
@@ -515,6 +520,7 @@ void profilesRemove(ESP8266WebServer& server, Mem*& mem, vector<String>& profile
             }
 
             loadMem(mem, profiles[0]+".mem");
+            loadSchedules(schedules, server.arg("profile")+".sch");
 
             profilesShow(server, profiles, "removed profile.");
         } else {

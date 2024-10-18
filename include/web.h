@@ -21,7 +21,7 @@ void loginLogin(ESP8266WebServer& server, String username, String password);
 
 
 void baseRecord(ESP8266WebServer& server, Mem* mem, int sensor, int led);
-void baseReset(ESP8266WebServer& server, Mem* mem);
+void baseReset(ESP8266WebServer& server, Mem* mem, Schedules* schedules);
 
 
 void remote(ESP8266WebServer& server, Mem* mem, const String& message);
@@ -45,9 +45,9 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem);
 
 
 void profilesShow(ESP8266WebServer& server, vector<String>& profiles, const String& message);
-void profilesSet(ESP8266WebServer& server, Mem*& mem, vector<String>& profiles);
+void profilesSet(ESP8266WebServer& server, Mem*& mem, Schedules*& schedules, vector<String>& profiles);
 void profilesAdd(ESP8266WebServer& server, vector<String>& profiles);
-void profilesRemove(ESP8266WebServer& server, Mem*& mem, vector<String>& profiles);
+void profilesRemove(ESP8266WebServer& server, Mem*& mem, Schedules*& schedules, vector<String>& profiles);
 
 
 #endif //WEB_H

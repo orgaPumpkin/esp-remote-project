@@ -126,3 +126,8 @@ int findField(String field, Mem* mem) {
     }
     return -1;
 }
+
+unsigned int findElement(const String &option, vector<String> &vec) {
+    auto optionPtr = find(vec.begin(), vec.end(), option);
+    return optionPtr - vec.begin();
+}

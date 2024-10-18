@@ -8,8 +8,15 @@
 
 using namespace std;
 
+typedef struct fieldValue {
+    unsigned int fieldI;
+    unsigned int optionI;
+    vector<bool> effected;
+} fieldValue;
+
 vector<bool> findEffected(unsigned int fieldI, Mem* mem);
-vector<int> buildDataMessage(ESP8266WebServer& server, Mem* mem);
+vector<fieldValue> getFieldsServer(ESP8266WebServer& server, Mem* mem);
+vector<int> buildDataMessage(vector<fieldValue> fields, Mem* mem);
 
 
 #endif //DATAMESSAGE_H

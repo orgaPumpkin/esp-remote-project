@@ -24,12 +24,16 @@ String g_led_state = "OFF";
 ESP8266WebServer server(80);
 
 Mem* g_mem;
+Schedules* g_schedules;
 String g_wifi_ssid;
 String g_wifi_pass;
 String g_username;
 String g_password;
+
 vector<String> g_profiles;
+
 String g_memPath;
+String g_schPath;
 
 void setup() {
     Serial.begin(9600);
@@ -54,10 +58,6 @@ void setup() {
     g_password = "";
     readString(f, g_password, '\n');
     f.close();
-    Serial.print(g_wifi_ssid);
-    Serial.print(",");
-    Serial.print(g_wifi_pass);
-    Serial.println(".");
 
     g_profiles = vector<String>();
     f = LittleFS.open("/profiles.txt", "r");
@@ -69,8 +69,10 @@ void setup() {
     f.close();
 
     g_memPath = g_profiles[0] + ".mem";
+    g_schPath = g_profiles[0] + ".sch";
 
     loadMem(g_mem, g_memPath);
+    loadSchedules(g_schedules, g_schPath);
 
     // web server setup
     startWIFI(g_wifi_ssid, g_wifi_pass);
@@ -136,9 +138,10 @@ void handleBase() {
                 baseRecord(server, g_mem, sensor_pin, led_pin);
 
             } else if (server.arg("action") == "reset") {
-                baseReset(server, g_mem);
+                baseReset(server, g_mem, g_schedules);
             }
             writeMem(g_memPath, g_mem);
+            writeSchedule(g_schedules, g_schPath);
 
         } else {
             String html = "";
@@ -245,15 +248,18 @@ void handleProfiles() {
     if (checkAuth(server)) {
         if (server.method() == HTTP_POST) {
             if (server.hasArg("profile")) {
-                profilesSet(server, g_mem, g_profiles);
+                profilesSet(server, g_mem, g_schedules, g_profiles);
                 g_memPath = g_profiles[0] + ".mem";
+                g_schPath = g_profiles[0] + ".sch";
 
             } else if (server.hasArg("add_profile")) {
                 profilesAdd(server, g_profiles);
 
             } else if (server.hasArg("remove_profile")) {
-                profilesRemove(server, g_mem, g_profiles);
+                profilesRemove(server, g_mem, g_schedules, g_profiles);
                 g_memPath = g_profiles[0] + ".mem";
+                g_schPath = g_profiles[0] + ".sch";
+
             }
         } else {
             profilesShow(server, g_profiles, "");
