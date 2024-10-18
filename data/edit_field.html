@@ -1,8 +1,81 @@
 <html>
 <head>
 	<title>ESP Web Server</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body *{
+			font-family: Helvetica,sans-serif;
+		}
+		body{
+			background-color: #0077B6;
+		}
+		.container{
+			border: 2px solid #0096C7;
+			background-color: #f3f3f3;
+			width: fit-content;
+			margin: auto;
+			padding: 25px;
+		}
+		input{
+			padding: 5px;
+			border: 1px solid #0096C7;
+			border-radius: 5px;
+		}
+		input[type=text],input[type=password]{
+			background-color: #fefefe;
+		}
+		input[type=submit]{
+			background-color: #00B4D8;
+			color: #f3f3f3;
+		}
+		input[type=submit]:hover{
+			background-color: #0077B6;
+		}
+		button,input[type=submit],select{
+
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(71, 176, 195);
+			border-radius: 5px;
+			padding: 5px;
+			display: inline;
+		}
+		button[name=remove_option]{
+			margin-left: auto;
+			background-color: rgba(255, 0, 0, 0.57);
+		}
+		button:hover, input[type=submit]:hover{
+
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(72, 202, 228);
+		}
+		.button_container{
+			display: flex;
+			margin-bottom: 5px;
+		}
+		.message:empty{
+			display:none
+		}
+		.message{
+			width: 100%;
+			background-color: rgba(205, 92, 92, 0.69);
+			border: 2px solid indianred;
+			padding: 5px;
+			border-radius: 5px;
+			color: #fefefe;
+		}
+		.multiselect{
+			display: flex;
+			flex-direction: column;
+			margin: 0;
+		}
+		.multiselect select{
+			height: 28px;
+			padding:0;
+			overflow: auto;
+		}
+	</style>
 </head>
 <body>
+<div class="container">
 <h1>{field}</h1>
 <h2>{disable_fields}</h2>
 <form action="" method="post">
@@ -16,29 +89,61 @@
 <h3 id="text" hidden>Edit options:</h3>
 <form id="options_form" action="" method="post">
 	<div id="options-box"></div>
-	<input hidden id="options" type="text" value="{options}">
+	<input hidden id="disable_options" type="text" value="{disable_fields}">
+	<input hidden id="options" type="text" value="test,hello;">
 </form>
 <a href="/remote">
 	<button>Back to remote</button>
 </a>
-<h2>%s</h2>
+<p class="message">%s</p>
+</div>
 </body>
 <script>
 	const text = document.getElementById("text")
     const option = document.getElementById("options")
     const options = option.value.split(",")
     const options_form = document.getElementById("options-box")
+	const disabled_option = document.getElementById("disable_options")
+	const disabled_options = disabled_option.value.split(",")
     if (options[0] !== "") {
         text.hidden = false
         for (let i = 0; i < options.length; i++) {
+			let button_container = document.createElement("div")
             let new_option = document.createElement("button")
-            new_option.type = "submit"
+			let new_option_delete = document.createElement("button")
+			new_option_delete.innerText = "Remove"
+			new_option_delete.value = options[i]
+			new_option_delete.name = "remove_option"
+			new_option_delete.type = "submit"
+			new_option.type = "submit"
             new_option.name = "add_option"
             new_option.innerText = options[i]
             new_option.value = options[i]
-            new_option.style.display = "block"
-            options_form.appendChild(new_option)
+            button_container.appendChild(new_option)
+			button_container.appendChild(new_option_delete)
+			button_container.classList.add("button_container")
+			button_container.append(createMultiselect())
+			options_form.append(button_container)
         }
     }
+	function createMultiselect() {
+		let form = document.createElement("form")
+		let new_select = document.createElement("select")
+		let submit_button = document.createElement("button")
+		form.classList.add("multiselect")
+		submit_button.type = "submit"
+		submit_button.innerText = "Update"
+		new_select.name = "field"
+		new_select.multiple = "true"
+		for (let i = 0; i < disabled_options.length; i++) {
+			let new_option = document.createElement("option")
+			new_option.value = disabled_options[i]
+			new_option.text = disabled_options[i]
+			new_select.append(new_option)
+		}
+		form.append(new_select)
+		form.append(submit_button)
+		return form;
+	}
 </script>
 </html>
