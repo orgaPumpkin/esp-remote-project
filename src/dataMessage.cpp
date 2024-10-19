@@ -34,7 +34,7 @@ vector<fieldValue> getFieldsServer(ESP8266WebServer& server, Mem* mem) {
         if (fieldI != -1) { // field exists
             Serial.println("found field");
             String option = server.arg(argName);
-            unsigned int optionI = findElement(option, mem->field_names[fieldI]);
+            unsigned int optionI = findElement(option, mem->field_names[fieldI])-1;
             if (optionI < mem->fields[fieldI].size()) { // option exists
                 Serial.println("found option");
                 fields.emplace_back();
