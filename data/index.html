@@ -23,10 +23,10 @@
     function CreateProfile(profile){
         profile_container.innerHTML += `
             <div class="profile">
-                <a class="profile_name" href="/remote/?profile=${profile}">
+                <a class="profile_name" href="/remote?profile=${profile}">
                 <h2 class="profile_name">${profile}</h2>
                 </a>
-                <a href="/edit/?profile=${profile}"><button class="edit_button">Edit</button></a>
+                <a href="/edit?profile=${profile}"><button class="edit_button">Edit</button></a>
                 <button name="delete" value="${profile}" hx-post="/" hx-confirm="Are You Sure You Want To Delete This Remote?" hx-target="closest .profile" hx-swap="delete" class="delete_button" >Delete</button>
             </div>
         `
