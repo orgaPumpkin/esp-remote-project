@@ -14,6 +14,7 @@ void processMessage(vector<int>& raw_message, vector<int>& message, Mem* mem);
 void sendMessage(vector<int>& message, int pin, Mem* mem);
 int findField(String field, Mem* mem);
 unsigned int findElement(const String &option, vector<String> &vec);
+bool getProfile(String profile, String& curr_profile, vector<String>& profiles, Mem*& mem, Schedules*& schedules);
 
 
 #endif //UTILS_H

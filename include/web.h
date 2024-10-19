@@ -20,34 +20,38 @@ void loginConnected(ESP8266WebServer& server);
 void loginLogin(ESP8266WebServer& server, String username, String password);
 
 
-void baseRecord(ESP8266WebServer& server, Mem* mem, int sensor, int led);
-void baseReset(ESP8266WebServer& server, Mem* mem, Schedules* schedules);
+void rootShow(ESP8266WebServer& server, vector<String>& profiles);
+void rootRemove(ESP8266WebServer& server, vector<String>& profiles);
+void rootAdd(ESP8266WebServer& server, vector<String>& profiles);
 
 
-void remote(ESP8266WebServer& server, Mem* mem, const String& message);
-void remoteBase(ESP8266WebServer& server, Mem* mem, int ir);
-void remoteWifi(ESP8266WebServer& server, Mem* mem, String& ssid, String& pass);
-void remoteEditUser(ESP8266WebServer& server, Mem* mem, String& username, String& password);
-
-void remoteAddToggle(ESP8266WebServer& server, Mem* mem, int sensor, int led);
-void remoteRemoveToggle(ESP8266WebServer& server, Mem* mem);
-void remoteAddField(ESP8266WebServer& server, Mem* mem);
-void remoteRemoveField(ESP8266WebServer& server, Mem* mem);
+void remoteShow(ESP8266WebServer& server, Mem* mem, const String& message);
 
 void remoteToggle(ESP8266WebServer& server, Mem* mem, int ir);
 void remoteSendData(ESP8266WebServer& server, Mem* mem, int ir);
+
+
+void editShow(ESP8266WebServer& server, Mem* mem, const String& message);
+
+void editAddToggle(ESP8266WebServer& server, Mem* mem, int sensor, int led);
+void editRemoveToggle(ESP8266WebServer& server, Mem* mem);
+void editAddField(ESP8266WebServer& server, Mem* mem);
+void editRemoveField(ESP8266WebServer& server, Mem* mem);
+
+void editSendBase(ESP8266WebServer& server, Mem* mem, int ir);
+void editRecordBase(ESP8266WebServer& server, Mem* mem, int sensor, int led);
+void editReset(ESP8266WebServer& server, Mem* mem, Schedules* schedules);
+
+
+void setupShow(ESP8266WebServer& server, const String& message);
+void setupWifi(ESP8266WebServer& server, String& ssid, String& pass);
+void setupUser(ESP8266WebServer& server, String& username, String& password);
 
 
 void editField(ESP8266WebServer& server, Mem* mem, String message);
 void editFieldAddOption(ESP8266WebServer& server, Mem* mem, int sensor, int led);
 void editFieldRemoveOption(ESP8266WebServer& server, Mem* mem);
 void editFieldEditRule(ESP8266WebServer& server, Mem* mem);
-
-
-void profilesShow(ESP8266WebServer& server, vector<String>& profiles, const String& message);
-void profilesSet(ESP8266WebServer& server, Mem*& mem, Schedules*& schedules, vector<String>& profiles);
-void profilesAdd(ESP8266WebServer& server, vector<String>& profiles);
-void profilesRemove(ESP8266WebServer& server, Mem*& mem, Schedules*& schedules, vector<String>& profiles);
 
 
 #endif //WEB_H

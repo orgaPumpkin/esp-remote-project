@@ -24,12 +24,14 @@ typedef struct Mem {
 
 
 typedef struct DataSchedule {
+    String name;
     vector<String> field_names;
     vector<String> option_names;
     time_t time;
 } DataSchedule;
 
 typedef struct ToggleSchedule {
+    String name;
     String toggle_name;
     time_t time;
 } Toggle;
@@ -47,13 +49,11 @@ void writeFile(const char *path, String content);
 
 void readString(File file, String& data, char terminator);
 
-void writeMem(String path, Mem* mem);
-Mem* readMem(String path);
-void loadMem(Mem*& mem, String path);
+void writeMem(const String& profile, Mem* mem);
+void loadMem(Mem*& mem, const String& profile);
 
-void writeSchedule(Schedules* schedules, String path);
-Schedules* readSchedules(String path);
-void loadSchedules(Schedules*& schedules, String path);
+void writeSchedule(Schedules* schedules, const String& profile);
+void loadSchedules(Schedules*& schedules, const String& profile);
 
 
 #endif //MFS_H

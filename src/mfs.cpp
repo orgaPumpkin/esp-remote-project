@@ -22,8 +22,6 @@ void listDir(const char *dirname) {
 }
 
 void readFile(const char* path, String* buf) {
-    Serial.printf("Reading file: %s\n", path);
-
     File file = LittleFS.open(path, "r");
     if (!file) {
         Serial.println("Failed to open file for reading");
@@ -173,10 +171,10 @@ void readStringVector3(File file, vector<vector<vector<String>>>& data, char ter
 
 
 
-void writeMem(String path, Mem* mem) {
+void writeMem(const String& profile, Mem* mem) {
     Serial.println("Writing mem");
     delay(1000);
-    File file = LittleFS.open(path, "w");
+    File file = LittleFS.open(profile+".mem", "w");
     if (!file) {
         Serial.println("Failed to open file for writing");
         return;
@@ -211,8 +209,8 @@ void writeMem(String path, Mem* mem) {
     file.close();
 }
 
-Mem* readMem(String path) {
-    File file = LittleFS.open(path, "r");
+Mem* readMem(const String& profile) {
+    File file = LittleFS.open(profile+".mem", "r");
     if (!file) {
         Serial.println("Failed to open file for writing");
         return nullptr;
@@ -252,8 +250,8 @@ Mem* readMem(String path) {
     return mem;
 }
 
-void loadMem(Mem*& mem, String path) {
-    if (!LittleFS.exists(path)) {
+void loadMem(Mem*& mem, const String& profile) {
+    if (!LittleFS.exists(profile+".mem")) {
         Serial.println("creating mem");
         mem = new Mem;
         mem->error_us = 300;
@@ -265,16 +263,16 @@ void loadMem(Mem*& mem, String path) {
         mem->toggles = vector<vector<int>>();
         mem->fields = vector<vector<vector<int>>>();
         mem->rules = vector<vector<vector<String>>>();
-        writeMem(path, mem);
+        writeMem(profile+".mem", mem);
     } else {
         Serial.println("mem already exists");
-        mem = readMem(path);
+        mem = readMem(profile+".mem");
     }
 }
 
 
-void writeSchedule(Schedules* schedules, String path) {
-    File file = LittleFS.open(path, "w");
+void writeSchedule(Schedules* schedules, const String& profile) {
+    File file = LittleFS.open(profile+".sch", "w");
     if (!file) {
         Serial.println("Failed to open file for writing");
         return;
@@ -282,6 +280,7 @@ void writeSchedule(Schedules* schedules, String path) {
     // data
     writeBytes(file, schedules->data_schedules.size());
     for (DataSchedule schedule : schedules->data_schedules) {
+        writeString(file, schedule.name);
         writeStringVector(file, schedule.field_names);
         writeStringVector(file, schedule.option_names);
         writeBytes(file, reinterpret_cast<char *>(schedule.time), sizeof(schedule.time));
@@ -289,15 +288,16 @@ void writeSchedule(Schedules* schedules, String path) {
     // toggles
     writeBytes(file, schedules->data_schedules.size());
     for (ToggleSchedule schedule : schedules->toggle_schedules) {
+        writeString(file, schedule.name);
         writeString(file, schedule.toggle_name);
         writeBytes(file, reinterpret_cast<char *>(schedule.time), sizeof(schedule.time));
     }
     file.close();
 }
 
-Schedules* readSchedules(String path) {
+Schedules* readSchedules(const String& profile) {
     Schedules* schedules = new Schedules();
-    File file = LittleFS.open(path, "r");
+    File file = LittleFS.open(profile+".sch", "r");
     int count, count2;
 
     // data
@@ -323,17 +323,17 @@ Schedules* readSchedules(String path) {
     return schedules;
 }
 
-void loadSchedules(Schedules*& schedules, String path) {
-    if (!LittleFS.exists(path)) {
+void loadSchedules(Schedules*& schedules, const String& profile) {
+    if (!LittleFS.exists(profile+".sch")) {
         Serial.println("creating schedules");
         schedules = new Schedules;
         schedules->data_schedules = vector<DataSchedule>();
         schedules->toggle_schedules = vector<ToggleSchedule>();
 
-        writeSchedule(schedules, path);
+        writeSchedule(schedules, profile+".sch");
     } else {
         Serial.println("schedules already exists");
-        schedules = readSchedules(path);
+        schedules = readSchedules(profile+".sch");
     }
     Serial.println("schedules loaded");
 }

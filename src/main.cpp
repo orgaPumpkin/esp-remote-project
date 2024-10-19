@@ -5,13 +5,16 @@
 
 using namespace std;
 
-void handleRoot();
 void handleLed();
+void handleRoot();
 void handleLogin();
-void handleBase();
+
 void handleRemote();
+void handleEdit();
+void handleSetup();
+
 void handleEditField();
-void handleProfiles();
+void handleSchedules();
 void handleNotFound();
 
 constexpr int led_pin = LED_BUILTIN;
@@ -25,15 +28,13 @@ ESP8266WebServer server(80);
 
 Mem* g_mem;
 Schedules* g_schedules;
+String g_profile = "";
 String g_wifi_ssid;
 String g_wifi_pass;
 String g_username;
 String g_password;
 
 vector<String> g_profiles;
-
-String g_memPath;
-String g_schPath;
 
 void setup() {
     Serial.begin(9600);
@@ -68,11 +69,7 @@ void setup() {
     }
     f.close();
 
-    g_memPath = g_profiles[0] + ".mem";
-    g_schPath = g_profiles[0] + ".sch";
-
-    loadMem(g_mem, g_memPath);
-    loadSchedules(g_schedules, g_schPath);
+    getProfile(g_profiles[0], g_profile, g_profiles, g_mem, g_schedules);
 
     // web server setup
     startWIFI(g_wifi_ssid, g_wifi_pass);
@@ -80,10 +77,12 @@ void setup() {
     server.on("/", handleRoot);
     server.on("/led", handleLed);
     server.on("/login", handleLogin);
-    server.on("/base", handleBase);
     server.on("/remote", handleRemote);
+    server.on("/edit", handleEdit);
+    server.on("/setup", handleSetup);
     server.on("/edit_field", handleEditField);
-    server.on("/profiles", handleProfiles);
+    server.on("/schedules", handleSchedules);
+    server.serveStatic("/stylesheet.css", LittleFS, "/stylesheet.css");
     server.onNotFound(handleNotFound);
     server.begin();
     digitalWrite(led_pin, HIGH);
@@ -92,20 +91,29 @@ void setup() {
 
 // handlers
 
-void handleRoot() {
-    if (checkAuth(server)) {
-        server.sendHeader("Location", "/remote");
-        server.send(302);
+void handleLed() {
+    if (checkAuth(server)) { // user is authenticated
+        ledPage(server, g_led_state, led_pin);
+
     } else {
         server.sendHeader("Location", "/login");
         server.send(302);
     }
 }
 
-void handleLed() {
-    if (checkAuth(server)) { // user is authenticated
-        ledPage(server, g_led_state, led_pin);
+void handleRoot() {
+    if (checkAuth(server)) {
+        if (server.method() == HTTP_POST) {
+            if (server.hasArg("delete")) {
+                rootRemove(server, g_profiles);
 
+            } else if (server.hasArg("add")) {
+                rootAdd(server, g_profiles);
+
+            }
+        } else {
+            rootShow(server, g_profiles);
+        }
     } else {
         server.sendHeader("Location", "/login");
         server.send(302);
@@ -131,23 +139,25 @@ void handleLogin() {
     }
 }
 
-void handleBase() {
+
+void handleRemote() {
     if (checkAuth(server)) {    // user is authenticated
-        if (server.method() == HTTP_POST && server.hasArg("action")) {
-            if (server.arg("action") == "record") {
-                baseRecord(server, g_mem, sensor_pin, led_pin);
+        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem, g_schedules)) {
+            if (server.method() == HTTP_POST) {
 
-            } else if (server.arg("action") == "reset") {
-                baseReset(server, g_mem, g_schedules);
+                if (server.hasArg("toggle")) {
+                    remoteToggle(server, g_mem, ir_pin);
+
+                } else {
+                    remoteSendData(server, g_mem, ir_pin);
+                }
+
+            } else {
+                remoteShow(server, g_mem, "");
             }
-            writeMem(g_memPath, g_mem);
-            writeSchedule(g_schedules, g_schPath);
-
         } else {
-            String html = "";
-            readFile("/base.html", &html);
-            html.replace("%s", "");
-            server.send(200, "text/html", html);
+            server.sendHeader("Location", "/");
+            server.send(302);
         }
     } else {
         server.sendHeader("Location", "/login");
@@ -155,34 +165,61 @@ void handleBase() {
     }
 }
 
-void handleRemote() {
+void handleEdit() {
+    if (checkAuth(server)) {
+        // user is authenticated
+        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem, g_schedules)) {
+            if (server.method() == HTTP_POST) {
+                if (server.hasArg("add_toggle")) {
+                    editAddToggle(server, g_mem, sensor_pin, led_pin);
+                    writeMem(g_profile, g_mem);
+
+                } else if (server.hasArg("remove_toggle")) {
+                    editRemoveToggle(server, g_mem);
+                    writeMem(g_profile, g_mem);
+
+                } else if (server.hasArg("add_field")) {
+                    editAddField(server, g_mem);
+                    writeMem(g_profile, g_mem);
+
+                } else if (server.hasArg("remove_field")) {
+                    editRemoveField(server, g_mem);
+                    writeMem(g_profile, g_mem);
+                }
+
+                if (server.hasArg("record_base")) {
+                    editRecordBase(server, g_mem, sensor_pin, led_pin);
+                    writeMem(g_profile, g_mem);
+
+                } else if (server.hasArg("reset")) {
+                    editReset(server, g_mem, g_schedules);
+                    writeMem(g_profile, g_mem);
+                    writeSchedule(g_schedules, g_profile);
+
+                } else if (server.hasArg("base")) {
+                    editSendBase(server, g_mem, ir_pin);
+                }
+
+            } else {
+                editShow(server, g_mem, "");
+            }
+
+        } else {
+            server.sendHeader("Location", "/");
+            server.send(302);
+        }
+    } else {
+        server.sendHeader("Location", "/login");
+        server.send(302);
+    }
+}
+
+
+void handleSetup() {
     if (checkAuth(server)) {    // user is authenticated
-
         if (server.method() == HTTP_POST) {
-            if (server.hasArg("base")) {
-                remoteBase(server, g_mem, ir_pin);
-
-            } else if (server.hasArg("toggle")) {
-                remoteToggle(server, g_mem, ir_pin);
-
-            } else if (server.hasArg("add_toggle")) {
-                remoteAddToggle(server, g_mem, sensor_pin, led_pin);
-                writeMem(g_memPath, g_mem);
-
-            } else if (server.hasArg("remove_toggle")) {
-                remoteRemoveToggle(server, g_mem);
-                writeMem(g_memPath, g_mem);
-
-            } else if (server.hasArg("add_field")) {
-                remoteAddField(server, g_mem);
-                writeMem(g_memPath, g_mem);
-
-            } else if (server.hasArg("remove_field")) {
-                remoteRemoveField(server, g_mem);
-                writeMem(g_memPath, g_mem);
-
-            } else if (server.hasArg("wifi_ssid") && server.hasArg("wifi_pass")) {
-                remoteWifi(server, g_mem, g_wifi_ssid, g_wifi_pass);
+            if (server.hasArg("wifi_ssid") && server.hasArg("wifi_pass")) {
+                setupWifi(server, g_wifi_ssid, g_wifi_pass);
                 File f = LittleFS.open("credentials.txt", "w");
                 if (f) {
                     f.print(g_wifi_ssid+'\n');
@@ -193,7 +230,7 @@ void handleRemote() {
                 }
 
             } else if (server.hasArg("username") && server.hasArg("password")) {
-                remoteEditUser(server, g_mem, g_username, g_password);
+                setupUser(server, g_username, g_password);
                 File f = LittleFS.open("credentials.txt", "w");
                 if (f) {
                     f.print(g_wifi_ssid+'\n');
@@ -202,14 +239,9 @@ void handleRemote() {
                     f.print(g_password+'\n');
                     f.close();
                 }
-
-            } else {
-                remoteSendData(server, g_mem, ir_pin);
             }
-
-        } else {
-            remote(server, g_mem, "");
         }
+        setupShow(server, "");
     } else {
         server.sendHeader("Location", "/login");
         server.send(302);
@@ -218,25 +250,29 @@ void handleRemote() {
 
 void handleEditField() {
     if (checkAuth(server)) {
-        // user is authenticated
-        if (server.hasArg("field") && findField(server.arg("field"), g_mem) != -1) {
-            if (server.method() == HTTP_POST) {
-                if (server.hasArg("add_option")) {
-                    editFieldAddOption(server, g_mem, sensor_pin, led_pin);
+        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem, g_schedules)) {
+            if (server.hasArg("field") && findField(server.arg("field"), g_mem) != -1) {
+                if (server.method() == HTTP_POST) {
+                    if (server.hasArg("add_option")) {
+                        editFieldAddOption(server, g_mem, sensor_pin, led_pin);
 
-                } else if (server.hasArg("remove_option")) {
-                    editFieldRemoveOption(server, g_mem);
+                    } else if (server.hasArg("remove_option")) {
+                        editFieldRemoveOption(server, g_mem);
 
-                } else if (server.hasArg("edit_rule") && server.hasArg("option")) {
-                    editFieldEditRule(server, g_mem);
+                    } else if (server.hasArg("edit_rule") && server.hasArg("option")) {
+                        editFieldEditRule(server, g_mem);
+                    }
+                    writeMem(g_profile, g_mem);
+
+                } else {
+                    editField(server, g_mem, "");
                 }
-                writeMem(g_memPath, g_mem);
-
             } else {
-                editField(server, g_mem, "");
+                server.send(401, "text/plain", "invalid field");
             }
         } else {
-            server.send(401, "text/plain", "invalid field");
+            server.sendHeader("Location", "/");
+            server.send(302);
         }
     } else {
         server.sendHeader("Location", "/login");
@@ -244,31 +280,18 @@ void handleEditField() {
     }
 }
 
-void handleProfiles() {
+void handleSchedules() {
     if (checkAuth(server)) {
         if (server.method() == HTTP_POST) {
-            if (server.hasArg("profile")) {
-                profilesSet(server, g_mem, g_schedules, g_profiles);
-                g_memPath = g_profiles[0] + ".mem";
-                g_schPath = g_profiles[0] + ".sch";
-
-            } else if (server.hasArg("add_profile")) {
-                profilesAdd(server, g_profiles);
-
-            } else if (server.hasArg("remove_profile")) {
-                profilesRemove(server, g_mem, g_schedules, g_profiles);
-                g_memPath = g_profiles[0] + ".mem";
-                g_schPath = g_profiles[0] + ".sch";
+            if (server.hasArg("edit_schedule")) {
 
             }
-        } else {
-            profilesShow(server, g_profiles, "");
         }
+
     } else {
         server.sendHeader("Location", "/login");
         server.send(302);
     }
-
 }
 
 void handleNotFound() {

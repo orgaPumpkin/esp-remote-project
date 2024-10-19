@@ -5,7 +5,7 @@
 	}
 </script>
 <head>
-	<title>ESP Web Server</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>esp-remote: edit remote</title> <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		.alert{
 			display: none;
@@ -81,32 +81,49 @@
 		@media screen and (max-width: 800px) {
 			.row{flex-direction: row}
 		}
-		select{width: 10%}
+		select{width: 45%}
 		#data_submit{
 			padding: 10px;
-			width: 30%;
+			width: 100%;
 			background-color: rgb(72, 202, 228);
 		}
 	</style>
 </head>
 <body>
 <div class="row" >
-	<div class="column left" style="background-color:#00B4D8;">
-		<h2>Remote</h2>
-		<!--toggles-->
-		<h4 hidden id="toggles_head" style="text-decoration: underline">Constants</h4>
-		<form id="toggle_form" action="" method="post">
-			<div id="toggles-box"></div>
-			<input hidden id="toggle" type="text" value="{toggles}">
-		</form>
-		<!--fields-->
-		<h4 hidden id="data_head" style="text-decoration: underline">Data message</h4>
+	<form id="toggle_form" action="" method="post">
+		<div id="toggles-box"></div>
+		<input hidden id="toggle" type="text" value="{toggles}">
+	</form>
+	<form action="" method="post">
+		<input hidden id="field" type="text" value="{fields}">
+		<input hidden id="last" type="text" value="{last}">
+	</form>
+	<div class="column middle" style="background-color:#0096C7;">
+		<h2>Edit</h2>
+
+		<h4 style="text-decoration: underline">Constants</h4>
+		<ul id="toggle-list"></ul>
+		<!--toggles setup-->
 		<form action="" method="post">
-			<div id="fields-box"></div>
-			<input hidden id="field" type="text" value="{fields}">
-			<input hidden id="last" type="text" value="{last}">
-			<br>
-			<input hidden id="data_submit" type="submit" value="Send data message">
+			<input id="add_toggle" class="input_field" type="text" name="add_toggle" autocomplete="off">
+			<input type="submit" value="Add constant">
+		</form>
+
+		<h4 style="text-decoration: underline">Data message fields</h4>
+		<!--base message-->
+		<form action="" method="post">
+			<button class="button" name="record_base" value="1">Set base data message</button>
+			<button class="button" name="base" value="1">Send base data message</button>
+		</form>
+		<ul id="field-list"></ul>
+		<!--fields setup-->
+		<form action="" method="post">
+			<input id="add_field" class="input_field" type="text" name="add_field" autocomplete="off">
+			<input type="submit" value="Add field">
+		</form>
+		<form action="" method="post">
+			<button class="button" name="reset" value="1">Reset remote</button>
 		</form>
 	</div>
 </div>
@@ -122,6 +139,8 @@
 	}
 	// fields
 
+	const toggle_list = document.getElementById("toggle-list")
+	const field_list = document.getElementById("field-list")
 	const last_options = document.getElementById("last").value.split(",")
 	const field = document.getElementById("field")
 	const fields = field.value.split(";")
@@ -130,6 +149,7 @@
 	if (fields[0] !== "") {
 		for (let i = 0; i < fields.length; i++) {
 			options = fields[i].split(",")
+			field_list.appendChild(CreateListItem(options[0],false))
 			if (options.length >= 3) {
 				document.getElementById("data_submit").hidden = false
 				document.getElementById("data_head").hidden = false
@@ -192,17 +212,9 @@
 	// toggles
 	const toggle = document.getElementById("toggle")
 	const toggles = toggle.value.split(",")
-	const toggles_form = document.getElementById("toggles-box")
 	if (toggles[0] !== "") {
-		document.getElementById("toggles_head").hidden = false
 		for (let i = 0; i < toggles.length; i++) {
-			let new_toggle = document.createElement("button")
-			new_toggle.type = "submit"
-			new_toggle.name = "toggle"
-			new_toggle.innerText = toggles[i]
-			new_toggle.value = toggles[i]
-			new_toggle.style.display = "block"
-			toggles_form.appendChild(new_toggle)
+			toggle_list.appendChild(CreateListItem(toggles[i],true))
 		}
 	}
 </script>

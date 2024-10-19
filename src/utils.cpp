@@ -131,3 +131,16 @@ unsigned int findElement(const String &option, vector<String> &vec) {
     auto optionPtr = find(vec.begin(), vec.end(), option);
     return optionPtr - vec.begin();
 }
+
+bool getProfile(String profile, String& curr_profile, vector<String>& profiles, Mem*& mem, Schedules*& schedules) {
+    if (count(profiles.begin(), profiles.end(), profile) > 0) {
+        if (profile != curr_profile) {
+            curr_profile = profile;
+            loadMem(mem, profile+".mem");
+            loadSchedules(schedules, profile+".sch");
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
