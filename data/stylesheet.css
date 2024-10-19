@@ -1,0 +1,62 @@
+html *{
+    font-family: Helvetica, sans-serif;
+}
+html,body{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+.profile_container{
+    display: flex;
+    flex-direction: column;
+}
+.profile{
+    gap: 5px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background-color: #f3f3f3;
+    border-bottom: 1px solid lightgray;
+}
+.profile_name{
+    color: #191919;
+    text-decoration: none;
+    margin:0;
+    flex-grow:1;
+}
+.edit_button{
+    background-color: #0F3376;
+    color: white;
+    border: none;
+    padding: 5px 32px;
+    border-radius: 5px;
+}
+.delete_button{
+
+    background-color: indianred;
+    color: white;
+    border: none;
+    padding: 5px 32px;
+    border-radius: 5px;
+}
+.delete_button:hover{
+    background-color: darkred;
+}
+.edit_button:hover{
+    background-color: #0c2551;
+}
+.add_button{
+    padding: 16px 32px;
+    background-color: mediumseagreen;
+    border: 1px solid lightseagreen;
+    color: white;
+    border-radius: 5px;
+    margin: 8px 0;
+    font-size: large;
+    width: fit-content;
+    align-self: center;
+    order: 1;
+}
+.add_button:hover{
+    background-color: seagreen;
+}

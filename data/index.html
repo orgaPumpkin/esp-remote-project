@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="stylesheet.css">
+    <meta charset="UTF-8">
+    <title>ESP Remote</title>
+</head>
+<body>
+<h1>ESP Remote</h1>
+<div id="profile_container" class="profile_container">
+
+    <button class="add_button" name="add" hx-post="/" onclick="AddProfile(this)" value="">Add Profile</button>
+</div>
+</body>
+<script>
+    const profile_container = document.getElementById('profile_container');
+    const profiles = JSON.parse('[' + '{profiles}' + ']')
+    profiles.forEach((profile) => {
+        CreateProfile(profile)
+    })
+    function CreateProfile(profile){
+        profile_container.innerHTML += `
+            <div class="profile">
+                <a class="profile_name" href="/remote/?profile=${profile}">
+                <h2 class="profile_name">${profile}</h2>
+                </a>
+                <a href="/edit/?profile=${profile}"><button class="edit_button">Edit</button></a>
+                <button name="delete" value="${profile}" hx-post="/" hx-confirm="Are You Sure You Want To Delete This Remote?" hx-target="closest .profile" hx-swap="delete" class="delete_button" >Delete</button>
+            </div>
+        `
+    }
+    function AddProfile(a) {
+        a.value = prompt("Profile Name?")
+    }
+</script>
+</html>
