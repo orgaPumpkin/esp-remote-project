@@ -4,8 +4,6 @@
 #include <FS.h>
 #include <LittleFS.h>
 #include <vector>
-#include <TimeLib.h>
-
 
 using namespace std;
 
@@ -22,18 +20,23 @@ typedef struct Mem {
     vector<vector<vector<int>>> fields;
 } Mem;
 
+typedef struct Time {
+    int days[7];
+    int hour;
+    int minute;
+} Time;
 
 typedef struct DataSchedule {
     String name;
     vector<String> field_names;
     vector<String> option_names;
-    time_t time;
+    Time time;
 } DataSchedule;
 
 typedef struct ToggleSchedule {
     String name;
     String toggle_name;
-    time_t time;
+    Time time;
 } Toggle;
 
 typedef struct Schedules {

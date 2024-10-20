@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <NTPClient.h>
 #include "web.h"
 #include "mfs.h"
 #include "utils.h"

@@ -283,14 +283,14 @@ void writeSchedule(Schedules* schedules, const String& profile) {
         writeString(file, schedule.name);
         writeStringVector(file, schedule.field_names);
         writeStringVector(file, schedule.option_names);
-        writeBytes(file, reinterpret_cast<char *>(schedule.time), sizeof(schedule.time));
+        writeBytes(file, reinterpret_cast<char *>(&schedule.time), sizeof(Time));
     }
     // toggles
     writeBytes(file, schedules->data_schedules.size());
     for (ToggleSchedule schedule : schedules->toggle_schedules) {
         writeString(file, schedule.name);
         writeString(file, schedule.toggle_name);
-        writeBytes(file, reinterpret_cast<char *>(schedule.time), sizeof(schedule.time));
+        writeBytes(file, reinterpret_cast<char *>(&schedule.time), sizeof(Time));
     }
     file.close();
 }
@@ -308,7 +308,7 @@ Schedules* readSchedules(const String& profile) {
 
         readStringVector(file, schedules->data_schedules[i].field_names, '\0');
         readStringVector(file, schedules->data_schedules[i].option_names, '\0');
-        file.readBytes(reinterpret_cast<char *>(&schedules->data_schedules[i].time), sizeof(time_t));
+        file.readBytes(reinterpret_cast<char *>(&schedules->data_schedules[i].time), sizeof(Time));
     }
 
     // toggles
@@ -316,7 +316,7 @@ Schedules* readSchedules(const String& profile) {
     schedules->toggle_schedules = vector<ToggleSchedule>(count);
     for (int i = 0; i < count; i++) {
         readString(file, schedules->toggle_schedules[i].toggle_name, '\0');
-        file.readBytes(reinterpret_cast<char *>(&schedules->toggle_schedules[i].time), sizeof(time_t));
+        file.readBytes(reinterpret_cast<char *>(&schedules->toggle_schedules[i].time), sizeof(Time));
     }
 
     file.close();
