@@ -23,19 +23,6 @@
 			font-family: Helvetica,sans-serif;
 		}
 
-		.column {
-			padding: 5px;
-			border-top: none;
-			flex-grow: 1;
-		}
-		.row{
-			height: 100%;
-			align-items: stretch;
-			display: flex;
-			flex-wrap: wrap;
-			align-content: stretch;
-
-		}
 		button,input[type=submit],select{
 
 			border: 1px solid rgba(0, 0, 0, 0.65);
@@ -49,16 +36,23 @@
 			border: 1px solid rgba(0, 0, 0, 0.65);
 			background-color: rgb(72, 202, 228);
 		}
+		.container{
+			border: 2px solid #0096C7;
+			background-color: #f3f3f3;
+			width: fit-content;
+			margin: auto;
+			padding: 25px;
+		}
 		html,body{
 			width: 100%;
 			height: 100%;
-			margin:0;
+			margin: 8px;
+			background-color: #0077B6;
 		}
 		.input_field{
-			border-radius: 5px;
-			padding: 5px;
-			border: 1px solid rgba(0, 0, 0, 0.65);
-			background-color: rgb(71, 176, 195);
+			border-radius: 4px;
+			padding: 4px;
+			border: 2px solid rgb(71, 176, 195);
 		}
 		@media screen and (max-width: 800px) {
 			.row{flex-direction: row}
@@ -66,40 +60,38 @@
 	</style>
 </head>
 <body>
-<div class="row" >
-	<div class="column right" style="background-color:#0077B6;">
-		<h2>Setup</h2>
-		<!--wifi-->
-		<h4 style="text-decoration: underline">Wi-fi</h4>
-		<form action="" method="post">
-			<label>WiFi name
-				<input class="input_field" type="text" name="wifi_ssid" autocomplete="off">
-			</label>
-			<br><br>
-			<label>WiFi password
-				<input class="input_field" type="password" name="wifi_pass" autocomplete="off">
-			</label>
-			<br><br>
-			<input type="submit" value="Set WiFi details">
-		</form>
+<div class="container">
+	<h2>Setup</h2>
+	<!--wifi-->
+	<h4 style="text-decoration: underline">Wi-fi</h4>
+	<form action="" method="post">
+		<label>WiFi ssid:
+			<input class="input_field" type="text" name="wifi_ssid" autocomplete="off">
+		</label>
+		<br><br>
+		<label>WiFi password:
+			<input class="input_field" type="password" name="wifi_pass" autocomplete="off">
+		</label>
+		<br><br>
+		<input type="submit" value="Set WiFi details">
+	</form>
 
-		<!--credentials-->
-		<h4 style="text-decoration: underline">Credentials</h4>
-		<form action="" method="post">
-			<label>username
-				<input class="input_field" type="text" name="username" autocomplete="off">
-			</label>
-			<br><br>
-			<label>password
-				<input class="input_field" type="password" name="password" autocomplete="off">
-			</label>
-			<br><br>
-			<input type="submit" value="Set login credentials">
-		</form>
-		<a id="back" href="/">
-			<button>Back to remotes</button>
-		</a>
-	</div>
+	<!--credentials-->
+	<h4 style="text-decoration: underline">Credentials</h4>
+	<form action="" method="post">
+		<label>username:
+			<input class="input_field" type="text" name="username" autocomplete="off">
+		</label>
+		<br><br>
+		<label>password:
+			<input class="input_field" type="password" name="password" autocomplete="off">
+		</label>
+		<br><br>
+		<input type="submit" value="Set login credentials">
+	</form>
+	<a id="back" href="/">
+		<button>Back to remotes</button>
+	</a>
 </div>
 <div class="alert">
 	<p style="font-size:xx-large;margin:2px" id="alert_text">%s</p>

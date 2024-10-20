@@ -67,10 +67,18 @@
 			border: 1px solid rgba(0, 0, 0, 0.65);
 			background-color: rgb(72, 202, 228);
 		}
+		.container{
+			border: 2px solid #0096C7;
+			background-color: #f3f3f3;
+			width: fit-content;
+			margin: auto;
+			padding: 25px;
+		}
 		html,body{
 			width: 100%;
 			height: 100%;
-			margin:0;
+			margin: 8px;
+			background-color: #0077B6;
 		}
 		.input_field{
 			border-radius: 5px;
@@ -90,28 +98,26 @@
 	</style>
 </head>
 <body>
-<div class="row" >
-	<div class="column left" style="background-color:#00B4D8;">
-		<h2>Remote</h2>
-		<!--toggles-->
-		<h4 hidden id="toggles_head" style="text-decoration: underline">Constants</h4>
-		<form id="toggle_form" action="" method="post">
-			<div id="toggles-box"></div>
-			<input hidden id="toggle" type="text" value="{toggles}">
-		</form>
-		<!--fields-->
-		<h4 hidden id="data_head" style="text-decoration: underline">Data message</h4>
-		<form action="" method="post">
-			<div id="fields-box"></div>
-			<input hidden id="field" type="text" value="{fields}">
-			<input hidden id="last" type="text" value="{last}">
-			<br>
-			<input hidden id="data_submit" type="submit" value="Send data message">
-		</form>
-		<a id="back" href="/">
-			<button>Back to remotes</button>
-		</a>
-	</div>
+<div class="container">
+	<h2>Remote</h2>
+	<!--toggles-->
+	<h4 hidden id="toggles_head" style="text-decoration: underline">Constants</h4>
+	<form id="toggle_form" action="" method="post">
+		<div id="toggles-box"></div>
+		<input hidden id="toggle" type="text" value="{toggles}">
+	</form>
+	<!--fields-->
+	<h4 hidden id="data_head" style="text-decoration: underline">Data message</h4>
+	<form action="" method="post">
+		<div id="fields-box"></div>
+		<input hidden id="field" type="text" value="{fields}">
+		<input hidden id="last" type="text" value="{last}">
+		<br>
+		<input hidden id="data_submit" type="submit" value="Send data message">
+	</form>
+	<a id="back" href="/">
+		<button>Back to remotes</button>
+	</a>
 </div>
 <div class="alert">
 	<p style="font-size:xx-large;margin:2px" id="alert_text">%s</p>
