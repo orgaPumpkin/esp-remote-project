@@ -87,7 +87,13 @@
 		<br><br>
 		<input type="submit" value="Set login credentials">
 	</form>
-	<a id="back" href="/">
+	<form action="" method="post">
+		<label>UTC +
+			<input class="input_field" type="number" name="timezone" min="-12" max="14" value="0">
+			<input type="submit" value="Set timezone">
+		</label>
+	</form>
+	<br><a id="back" href="/">
 		<button>Back to profiles</button>
 	</a>
 </div>

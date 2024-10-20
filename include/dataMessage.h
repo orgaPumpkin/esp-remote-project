@@ -6,7 +6,7 @@
 #include <mfs.h>
 #include <utils.h>
 
-using namespace std;
+using std::vector;
 
 typedef struct fieldValue {
     unsigned int fieldI;
@@ -16,6 +16,7 @@ typedef struct fieldValue {
 
 vector<bool> findEffected(unsigned int fieldI, Mem* mem);
 vector<fieldValue> getFieldsServer(ESP8266WebServer& server, Mem* mem);
+vector<fieldValue> getFieldsSchedule(DataSchedule& schedule, Mem* mem);
 vector<int> buildDataMessage(vector<fieldValue> fields, Mem* mem);
 
 

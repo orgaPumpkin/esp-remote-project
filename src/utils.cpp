@@ -1,6 +1,5 @@
 #include "utils.h"
-
-#include <bits/locale_classes.h>
+#include <dataMessage.h>
 
 bool getMessage(vector<int>& raw_message, int sensor, int led) {
     bool state = LOW;
@@ -143,4 +142,30 @@ bool getProfile(String profile, String& curr_profile, vector<String>& profiles, 
         return false;
     }
     return true;
+}
+
+void sendSchedules(Schedules* schedules, Mem* mem, NTPClient& timeClient, int ir_pin) {
+    // data
+    Serial.println(timeClient.getFormattedTime());
+    for (DataSchedule schedule : schedules->data_schedules) {
+        if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
+            vector<fieldValue> fields = getFieldsSchedule(schedule, mem);
+            vector<int> message = buildDataMessage(fields, mem);
+            sendMessage(message, ir_pin, mem);
+            delay(100);
+        }
+    }
+    // toggle
+    for (ToggleSchedule schedule : schedules->toggle_schedules) {
+        if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
+            unsigned int toggleI = findElement(schedule.toggle_name, mem->toggle_names);
+            Serial.println(toggleI);
+            if (toggleI < mem->toggle_names.size()) {
+                Serial.println("toggle schedule");
+                vector<int> message = mem->toggles[toggleI];
+                sendMessage(message, ir_pin, mem);
+                delay(100);
+            }
+        }
+    }
 }

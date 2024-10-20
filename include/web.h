@@ -3,6 +3,8 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <NTPClient.h>
+
 #include "utils.h"
 #include "dataMessage.h"
 
@@ -46,6 +48,7 @@ void editReset(ESP8266WebServer& server, Mem* mem, Schedules* schedules);
 void setupShow(ESP8266WebServer& server, const String& message);
 void setupWifi(ESP8266WebServer& server, String& ssid, String& pass);
 void setupUser(ESP8266WebServer& server, String& username, String& password);
+void setupTimeZone(ESP8266WebServer& server, NTPClient& ntp);
 
 
 void editField(ESP8266WebServer& server, Mem* mem, String message);

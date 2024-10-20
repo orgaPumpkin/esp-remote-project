@@ -49,6 +49,31 @@ vector<fieldValue> getFieldsServer(ESP8266WebServer& server, Mem* mem) {
     return fields;
 }
 
+vector<fieldValue> getFieldsSchedule(DataSchedule& schedule, Mem* mem) {
+    vector<fieldValue> fields = vector<fieldValue>();
+
+    // for field in schedule
+    for (unsigned int i = 0; i < schedule.field_names.size(); i++) {
+
+        // extract all fields data
+        int fieldI = findField(schedule.field_names[i], mem);
+        if (fieldI != -1) { // field exists
+            Serial.println("found field");
+            unsigned int optionI = findElement(schedule.option_names[i], mem->field_names[fieldI])-1;
+            if (optionI < mem->fields[fieldI].size()) { // option exists
+                Serial.println("found option");
+                fields.emplace_back();
+                fields.back().fieldI = fieldI;
+                fields.back().optionI = optionI;
+                fields.back().effected = findEffected(fieldI, mem);
+                mem->last_options[fieldI] = optionI;
+            }
+        }
+    }
+
+    return fields;
+}
+
 
 vector<int> buildDataMessage(vector<fieldValue> fields, Mem* mem) {
 

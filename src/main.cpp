@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include <NTPClient.h>
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
 #include "web.h"
 #include "mfs.h"
 #include "utils.h"
 
-using namespace std;
+using std::vector;
 
 void handleLed();
 void handleRoot();
@@ -22,10 +24,13 @@ constexpr int led_pin = LED_BUILTIN;
 constexpr int ir_pin = D2;
 constexpr int sensor_pin = D1;
 
-String g_led_state = "OFF";
-
 // Set web server port number to 80
 ESP8266WebServer server(80);
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+
+String g_led_state = "OFF";
 
 Mem* g_mem;
 Schedules* g_schedules;
@@ -70,6 +75,18 @@ void setup() {
     }
     f.close();
 
+    if (LittleFS.exists("/timezone")) {
+        f = LittleFS.open("/timezone", "r");
+        int timeZone;
+        f.readBytes(reinterpret_cast<char *>(&timeZone), sizeof(timeZone));
+        timeClient.setTimeOffset(3600*timeZone);
+        f.close();
+    } else {
+        f = LittleFS.open("/timezone", "w");
+        writeBytes(f, 0);
+        f.close();
+    }
+
     getProfile(g_profiles[0], g_profile, g_profiles, g_mem, g_schedules);
 
     // web server setup
@@ -86,6 +103,9 @@ void setup() {
     server.serveStatic("/stylesheet.css", LittleFS, "/stylesheet.css");
     server.onNotFound(handleNotFound);
     server.begin();
+
+    timeClient.begin();
+
     digitalWrite(led_pin, HIGH);
 }
 
@@ -240,6 +260,8 @@ void handleSetup() {
                     f.print(g_password+'\n');
                     f.close();
                 }
+            } else if (server.hasArg("timezone")) {
+                setupTimeZone(server, timeClient);
             }
         }
         setupShow(server, "");
@@ -301,12 +323,22 @@ void handleNotFound() {
 
 
 // main loop
+int minute = -1;
 
 void loop() {
+    timeClient.update();
+
     if (WiFi.status() == WL_CONNECTED || WiFi.softAPgetStationNum() > 0) {
         server.handleClient();
     } else {
         Serial.println("WiFi not connected");
         delay(500);
+    }
+
+    if (timeClient.isTimeSet()) {
+        if (minute != timeClient.getMinutes()) {
+            minute = timeClient.getMinutes();
+            sendSchedules(g_schedules, g_mem, timeClient, ir_pin);
+        }
     }
 }

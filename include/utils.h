@@ -2,10 +2,11 @@
 #define UTILS_H
 
 #include <Arduino.h>
+#include <NTPClient.h>
 #include <vector>
 #include "mfs.h"
 
-using namespace std;
+using std::vector;
 
 bool getMessage(vector<int>& raw_message, int sensor, int led);
 void makeRanges(vector<int>& unknown_ranges, Mem* mem);
@@ -15,6 +16,7 @@ void sendMessage(vector<int>& message, int pin, Mem* mem);
 int findField(String field, Mem* mem);
 unsigned int findElement(const String &option, vector<String> &vec);
 bool getProfile(String profile, String& curr_profile, vector<String>& profiles, Mem*& mem, Schedules*& schedules);
+void sendSchedules(Schedules* schedules, Mem* mem, NTPClient& timeClient, int ir_pin);
 
 
 #endif //UTILS_H

@@ -5,7 +5,7 @@
 #include <LittleFS.h>
 #include <vector>
 
-using namespace std;
+using std::vector;
 
 typedef struct Mem {
     int error_us;
@@ -21,7 +21,7 @@ typedef struct Mem {
 } Mem;
 
 typedef struct Time {
-    int days[7];
+    bool days[7];
     int hour;
     int minute;
 } Time;
@@ -51,6 +51,7 @@ void dumpFile(const char* path);
 void writeFile(const char *path, String content);
 
 void readString(File file, String& data, char terminator);
+void writeBytes(File& file, int x);
 
 void writeMem(const String& profile, Mem* mem);
 void loadMem(Mem*& mem, const String& profile);

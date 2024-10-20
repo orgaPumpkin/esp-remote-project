@@ -1,4 +1,7 @@
 #include "web.h"
+
+#include <NTPClient.h>
+
 #include "mfs.h"
 
 void startWIFI(String& ssid, String& pass) {
@@ -400,6 +403,15 @@ void setupUser(ESP8266WebServer& server, String& username, String& password) {
     username = server.arg("username");
     password = server.arg("password");
     setupShow(server, "login details updated.");
+}
+
+void setupTimeZone(ESP8266WebServer& server, NTPClient& ntp) {
+    int timezone = server.arg("timezone").toInt();
+    File f = LittleFS.open("/timezone", "w");
+    writeBytes(f, timezone);
+    f.close();
+    ntp.setTimeOffset(3600*timezone);
+    setupShow(server, "Time zone set");
 }
 
 

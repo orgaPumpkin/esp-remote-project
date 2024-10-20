@@ -329,6 +329,12 @@ void loadSchedules(Schedules*& schedules, const String& profile) {
         schedules = new Schedules;
         schedules->data_schedules = vector<DataSchedule>();
         schedules->toggle_schedules = vector<ToggleSchedule>();
+        // schedules->toggle_schedules[0].name = "off";
+        // schedules->toggle_schedules[0].toggle_name = "off";
+        // schedules->toggle_schedules[0].time.days[0]=true;
+        // schedules->toggle_schedules[0].time.hour=22;
+        // schedules->toggle_schedules[0].time.minute=4;
+
 
         writeSchedule(schedules, profile+".sch");
     } else {
