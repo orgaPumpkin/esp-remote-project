@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>ESP Web Server</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>esp-remote: edit field</title> <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		body *{
 			font-family: Helvetica,sans-serif;
@@ -89,19 +89,23 @@
 	<label for="disable_options"></label><input hidden id="disable_options" type="text" value="{disable_fields}">
 	<label for="options"></label><input hidden id="options" type="text" value="{options}">
 </form>
-<a href="/remote">
-	<button>Back to remote</button>
+<a id="back" href="/edit">
+	<button>Back to edit</button>
 </a>
 <p class="message">%s</p>
 </div>
 </body>
 <script>
+	const params = new URLSearchParams(document.location.search);
+	const back = document.getElementById("back")
+	back.href = "/edit?profile=" + params.get("profile")
+
 	const text = document.getElementById("text")
     const option = document.getElementById("options")
     const options = option.value.split(",")
     const options_form = document.getElementById("options-box")
-	const disabled_option = document.getElementById("disable_options")
-	const disabled_options = disabled_option.value.split(",")
+	const disabled_field = document.getElementById("disable_options")
+	const disabled_fields = disabled_field.value.split(",")
     if (options[0] !== "") {
         text.hidden = false
         for (let i = 0; i < options.length; i++) {
@@ -119,23 +123,26 @@
             button_container.appendChild(new_option)
 			button_container.appendChild(new_option_delete)
 			button_container.classList.add("button_container")
-			button_container.append(createMultiselect())
+			button_container.append(createMultiselect(options[i]))
 			options_form.append(button_container)
         }
     }
-	function createMultiselect() {
+	function createMultiselect(option) {
 		let form = document.createElement("form")
 		let new_select = document.createElement("select")
 		let submit_button = document.createElement("button")
 		form.classList.add("multiselect")
+		form.method = "post"
 		submit_button.type = "submit"
 		submit_button.innerText = "Disable Fields"
+		submit_button.name = "option"
+		submit_button.value = option
 		new_select.name = "edit_rule"
-		new_select.multiple = "true"
-		for (let i = 0; i < disabled_options.length; i++) {
+		new_select.multiple = true
+		for (let i = 0; i < disabled_fields.length; i++) {
 			let new_option = document.createElement("option")
-			new_option.value = disabled_options[i]
-			new_option.text = disabled_options[i]
+			new_option.value = disabled_fields[i]
+			new_option.text = disabled_fields[i]
 			new_select.append(new_option)
 		}
 		form.append(new_select)

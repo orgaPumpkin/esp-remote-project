@@ -125,6 +125,9 @@
 		<form action="" method="post">
 			<button class="button" name="reset" value="1">Reset remote</button>
 		</form>
+		<br><a id="back" href="/">
+			<button>Back to remotes</button>
+		</a>
 	</div>
 </div>
 <div class="alert">
@@ -174,7 +177,9 @@
 			}
 		}
 	}
+
 	function CreateListItem(field_name,toggle) {
+		const profile = (new URLSearchParams(document.location.search)).get("profile")
 		const li = document.createElement('li')
 		li.id = field_name;
 		const p = document.createElement("p")
@@ -191,7 +196,7 @@
 
 		if(toggle===false){
 			const edit_anchor = document.createElement("a")
-			edit_anchor.href = `javascript:window.open("/edit_field?field=${field_name}", "_self")`
+			edit_anchor.href = `javascript:window.open("/edit_field?profile=${profile}&field=${field_name}", "_self")`
 			edit_anchor.appendChild(edit_button)
 			li.appendChild(edit_anchor)
 
