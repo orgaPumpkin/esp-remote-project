@@ -1,4 +1,7 @@
-![web_page.png](https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/web_page.png)
+<img alt="profiles.png" height="400" src="profiles.png"/>
+<img alt="remote.png" height="400" src="remote.png"/>
+<img alt="edit.png" height="400" src="edit.png"/>
+<img alt="setup.png" height="400" src="setup.png"/>
 
 ![wakatime](https://img.shields.io/endpoint?url=https%3A%2F%2Fwaka.hackclub.com%2Fapi%2Fcompat%2Fshields%2Fv1%2FU07QBRYGVHC%2Fall_time%2Fproject%253Aesp-remote)
 
@@ -25,7 +28,7 @@ The only step of the process that was recorded in the Hackatime is a part of the
 which means that in total, the amount of time spent might be more than triple the time recorded.
 
 # Plans
-In the future, I plan on adding message scheduling and device profiles features.
+In the future, I plan on adding a message scheduling feature.
 
 # More Info And How To Use
 More info can be found in the [main readme](https://github.com/orgaPumpkin/esp-remote-project/blob/master/readme.md).
