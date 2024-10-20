@@ -16,7 +16,7 @@
 			border-radius: 15px;
 			width: fit-content	;
 			margin: 3px;
-
+			padding: 5px;
 		}
 		ul{
 			padding: 0;
@@ -27,19 +27,6 @@
 			font-family: Helvetica,sans-serif;
 		}
 
-		.column {
-			padding: 5px;
-			border-top: none;
-			flex-grow: 1;
-		}
-		.row{
-			height: 100%;
-			align-items: stretch;
-			display: flex;
-			flex-wrap: wrap;
-			align-content: stretch;
-
-		}
 		li{
 			display: flex;
 			align-content: center;
@@ -57,6 +44,7 @@
 			border: 1px solid rgba(0, 0, 0, 0.65);
 			background-color: rgb(71, 176, 195);
 			border-radius: 5px;
+			margin: 5px;
 			padding: 5px;
 		}
 		button[name=remove_toggle],button[name=remove_field]{
@@ -75,8 +63,6 @@
 			padding: 25px;
 		}
 		html,body{
-			width: 100%;
-			height: 100%;
 			margin: 8px;
 			background-color: #0077B6;
 		}
@@ -89,11 +75,11 @@
 		@media screen and (max-width: 800px) {
 			.row{flex-direction: row}
 		}
-		select{width: 10%}
+		select{width: 80%}
 		#data_submit{
+			margin: 0;
 			padding: 10px;
-			width: 30%;
-			background-color: rgb(72, 202, 228);
+			width: auto;
 		}
 	</style>
 </head>
@@ -115,8 +101,8 @@
 		<br>
 		<input hidden id="data_submit" type="submit" value="Send data message">
 	</form>
-	<a id="back" href="/">
-		<button>Back to remotes</button>
+	<br><a id="back" href="/">
+		<button>Back to profiles</button>
 	</a>
 </div>
 <div class="alert">
@@ -162,40 +148,6 @@
 				fields_form.appendChild(new_select)
 			}
 		}
-	}
-	function CreateListItem(field_name,toggle) {
-		const li = document.createElement('li')
-		li.id = field_name;
-		const p = document.createElement("p")
-		const edit_button = document.createElement("button")
-		const remove_button = document.createElement("button")
-		const form = document.createElement("form")
-		p.innerText = field_name
-		edit_button.innerText = "Edit"
-		remove_button.innerText = "Remove"
-		remove_button.value = field_name
-		remove_button.name = "remove_field"
-		form.method = "post"
-		li.appendChild(p)
-
-		if(toggle===false){
-			const edit_anchor = document.createElement("a")
-			edit_anchor.href = `javascript:window.open("/edit_field?field=${field_name}", "_self")`
-			edit_anchor.appendChild(edit_button)
-			li.appendChild(edit_anchor)
-
-		}
-		else{
-			form.classList = "toggle-form"
-			edit_button.name= "add_toggle"
-			edit_button.value= field_name
-			form.appendChild(edit_button)
-			remove_button.name = "remove_toggle"
-
-		}
-		form.appendChild(remove_button)
-		li.appendChild(form)
-		return li
 	}
 
 	// toggles

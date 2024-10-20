@@ -62,8 +62,6 @@
 			background-color: rgb(72, 202, 228);
 		}
 		body{
-			width: 100%;
-			height: 100%;
 			margin: 8px;
 			background-color: #0077B6;
 		}
@@ -76,11 +74,6 @@
 			.row{flex-direction: row}
 		}
 		select{width: 45%}
-		#data_submit{
-			padding: 10px;
-			width: 100%;
-			background-color: rgb(72, 202, 228);
-		}
 
 	</style>
 </head>
@@ -91,7 +84,6 @@
 </form>
 <form action="" method="post">
 	<input hidden id="field" type="text" value="{fields}">
-	<input hidden id="last" type="text" value="{last}">
 </form>
 <div class="container">
 	<h2>Edit</h2>
@@ -120,7 +112,7 @@
 		<button class="button" name="reset" value="1">Reset remote</button>
 	</form>
 	<br><a id="back" href="/">
-		<button>Back to remotes</button>
+		<button>Back to profiles</button>
 	</a>
 </div>
 
@@ -138,37 +130,12 @@
 
 	const toggle_list = document.getElementById("toggle-list")
 	const field_list = document.getElementById("field-list")
-	const last_options = document.getElementById("last").value.split(",")
-	const field = document.getElementById("field")
-	const fields = field.value.split(";")
-	const fields_form = document.getElementById("fields-box")
+	const fields = document.getElementById("field").value.split(";")
 	let options = []
 	if (fields[0] !== "") {
 		for (let i = 0; i < fields.length; i++) {
 			options = fields[i].split(",")
 			field_list.appendChild(CreateListItem(options[0],false))
-			if (options.length >= 3) {
-				document.getElementById("data_submit").hidden = false
-				document.getElementById("data_head").hidden = false
-				let new_select = document.createElement("select")
-				let new_label = document.createElement("label")
-				new_label.htmlFor = options[0]
-				new_label.innerText = options[0]
-				new_select.id = options[0]
-				new_select.name = options[0]
-				new_select.style.display = "block"
-				for (let j = 1; j < options.length; j++) {
-					let new_option = document.createElement("option")
-					new_option.value = options[j]
-					new_option.innerText = options[j]
-					if (j === parseInt(last_options[i])+1) {
-						new_option.selected = true
-					}
-					new_select.options.add(new_option)
-				}
-				fields_form.appendChild(new_label)
-				fields_form.appendChild(new_select)
-			}
 		}
 	}
 
