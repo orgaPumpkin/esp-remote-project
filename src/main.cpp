@@ -312,7 +312,11 @@ void handleSchedules() {
             if (server.hasArg("edit_schedule")) {
 
             }
+
+        } else {
+            schedulesShow(server, g_schedules);
         }
+
 
     } else {
         server.sendHeader("Location", "/login");
@@ -344,4 +348,5 @@ void loop() {
             sendSchedules(g_schedules, timeClient, ir_pin);
         }
     }
+    delay(10);
 }

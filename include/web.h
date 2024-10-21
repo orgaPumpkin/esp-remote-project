@@ -56,5 +56,7 @@ void editFieldAddOption(ESP8266WebServer& server, Mem* mem, int sensor, int led)
 void editFieldRemoveOption(ESP8266WebServer& server, Mem* mem);
 void editFieldEditRule(ESP8266WebServer& server, Mem* mem);
 
+void schedulesShow(ESP8266WebServer& server, Schedules* schedules);
+
 
 #endif //WEB_H

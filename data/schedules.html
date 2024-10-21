@@ -1,0 +1,148 @@
+<html lang="en">
+<script>
+	if ( window.history.replaceState ) {
+		window.history.replaceState( null, null, window.location.href );
+	}
+</script>
+<head>
+	<title>esp-remote: schedules</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		.alert{
+			display: none;
+			position: absolute;
+			bottom: 0;
+			background: rgba(116, 195, 225, 1);
+			border: 1px solid #0F3376;
+			border-radius: 15px;
+			width: fit-content	;
+			margin: 3px;
+			padding: 5px;
+		}
+		ul{
+			padding: 0;
+			list-style: none;
+		}
+		html *{
+			color: #191919;
+			font-family: Helvetica,sans-serif;
+		}
+
+		li{
+			display: flex;
+			align-content: center;
+			align-items: center;
+
+		}
+		li a,.toggle-form{
+			margin-left: auto;
+		}
+		li form{
+			margin: 0;
+		}
+		button,input[type=submit],select{
+
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(71, 176, 195);
+			border-radius: 5px;
+			margin: 5px;
+			padding: 5px;
+		}
+		button[name=remove]{
+			background-color: rgba(255, 0, 0, 0.57);
+		}
+		button:hover, input[type=submit]:hover{
+
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(72, 202, 228);
+		}
+		.container{
+			border: 2px solid #0096C7;
+			background-color: #f3f3f3;
+			width: fit-content;
+			margin: auto;
+			padding: 25px;
+		}
+		html,body{
+			margin: 8px;
+			background-color: #0077B6;
+		}
+		.input_field{
+			border-radius: 5px;
+			padding: 5px;
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(71, 176, 195);
+		}
+		@media screen and (max-width: 800px) {
+			.row{flex-direction: row}
+		}
+		select{width: 80%}
+		#data_submit{
+			margin: 0;
+			padding: 10px;
+			width: auto;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<h2>Schedules</h2>
+	<!--fields-->
+	<form action="" method="post">
+		<input hidden id="names" type="text" value="{names}">
+		<input hidden id="days" type="text" value="{days}">
+		<input hidden id="times" type="text" value="{times}">
+	</form>
+	<ul id="schedules-list"></ul>
+	<br><a id="back" href="/">
+	<button>Back to profiles</button>
+</a>
+</div>
+<div class="alert">
+	<p style="font-size:xx-large;margin:2px" id="alert_text">%s</p>
+	<i style="margin-left: auto;padding: 5px;" onclick="this.parentElement.style.display = 'none';" >&#x2716;</i>
+</div>
+</body>
+<script>
+	const alert_text = document.getElementById("alert_text")
+	if (alert_text.innerText !== ""){
+		alert_text.parentElement.style.display = "flex";
+	}
+
+	// schedules
+
+	const schedules_list = document.getElementById("schedules-list")
+	const names = document.getElementById("names").value.split(",")
+	const days = document.getElementById("days").value.split(",")
+	const times = document.getElementById("times").value.split(",")
+	if (names[0] !== "") {
+		for (let i = 0; i < names.length; i++) {
+			schedules_list.appendChild(CreateListItem(names[i], days[i], times[i]))
+		}
+	}
+
+	function CreateListItem(name, days, time) {
+		const li = document.createElement('li')
+		li.id = name;
+		const p = document.createElement("p")
+		const edit_button = document.createElement("button")
+		const remove_button = document.createElement("button")
+		const form = document.createElement("form")
+		p.innerText = time+" - "+name
+		edit_button.innerText = "Edit"
+		remove_button.innerText = "Remove"
+		remove_button.value = name
+		remove_button.name = "remove"
+		form.method = "post"
+		li.appendChild(p)
+
+		const edit_anchor = document.createElement("a")
+		edit_anchor.href = `javascript:window.open("/edit_schedule?schedule=${name}", "_self")`
+		edit_anchor.appendChild(edit_button)
+		li.appendChild(edit_anchor)
+
+		form.appendChild(remove_button)
+		li.appendChild(form)
+		return li
+	}
+</script>
+</html>

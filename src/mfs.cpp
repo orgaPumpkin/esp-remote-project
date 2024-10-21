@@ -272,7 +272,7 @@ void loadMem(Mem*& mem, const String& profile) {
 
 
 void writeSchedule(Schedules* schedules) {
-    File file = LittleFS.open("schedules", "w");
+    File file = LittleFS.open("/schedules", "w");
     if (!file) {
         Serial.println("Failed to open file for writing");
         return;
@@ -281,16 +281,22 @@ void writeSchedule(Schedules* schedules) {
     writeBytes(file, schedules->data_schedules.size());
     for (DataSchedule schedule : schedules->data_schedules) {
         writeString(file, schedule.name);
+        writeString(file, schedule.profile);
+
         writeStringVector(file, schedule.field_names);
         writeStringVector(file, schedule.option_names);
+
         writeBytes(file, reinterpret_cast<char *>(&schedule.time), sizeof(Time));
     }
     Serial.println("Wrote data schedules");
     // toggles
-    writeBytes(file, schedules->data_schedules.size());
+    writeBytes(file, schedules->toggle_schedules.size());
     for (ToggleSchedule schedule : schedules->toggle_schedules) {
         writeString(file, schedule.name);
+        writeString(file, schedule.profile);
+
         writeString(file, schedule.toggle_name);
+
         writeBytes(file, reinterpret_cast<char *>(&schedule.time), sizeof(Time));
     }
     file.close();
@@ -298,7 +304,7 @@ void writeSchedule(Schedules* schedules) {
 
 Schedules* readSchedules() {
     Schedules* schedules = new Schedules();
-    File file = LittleFS.open("schedules", "r");
+    File file = LittleFS.open("/schedules", "r");
     int count;
 
     // data
@@ -331,17 +337,17 @@ Schedules* readSchedules() {
 }
 
 void loadSchedules(Schedules*& schedules) {
-    if (!LittleFS.exists("schedules")) {
+    if (!LittleFS.exists("/schedules")) {
         Serial.println("creating schedules");
         schedules = new Schedules;
         schedules->data_schedules = vector<DataSchedule>();
-        schedules->toggle_schedules = vector<ToggleSchedule>();
-        // schedules->toggle_schedules[0].name = "off";
-        // schedules->toggle_schedules[0].profile = "1";
-        // schedules->toggle_schedules[0].toggle_name = "off";
-        // schedules->toggle_schedules[0].time.days[1]=true;
-        // schedules->toggle_schedules[0].time.hour=17;
-        // schedules->toggle_schedules[0].time.minute=30;
+        schedules->toggle_schedules = vector<ToggleSchedule>(1);
+        schedules->toggle_schedules[0].name = "off";
+        schedules->toggle_schedules[0].profile = "Default";
+        schedules->toggle_schedules[0].toggle_name = "off";
+        schedules->toggle_schedules[0].time.days[1]=true;
+        schedules->toggle_schedules[0].time.hour=17;
+        schedules->toggle_schedules[0].time.minute=30;
 
 
         writeSchedule(schedules);

@@ -538,21 +538,38 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
     }
 }
 
-// void schedulingShow(ESP8266WebServer& server, Schedules* schedules) {
-//     int index = -1;
-//     bool data = false;
-//
-//     for (size_t i = 0; i < schedules->data_schedules.size(); i++) {
-//         if (schedules->data_schedules[i].name == server.arg("edit_schedule")) {
-//             index = i;
-//             data = true;
-//         }
-//     }
-//     if (!data) {
-//         for (size_t i = 0; i < schedules->toggle_schedules.size(); i++) {
-//             if (schedules->toggle_schedules[i].name == server.arg("edit_schedule")) {
-//                 index = i;
-//             }
-//         }
-//     }
-// }
+void schedulesShow(ESP8266WebServer& server, Schedules* schedules) {
+    String html = "";
+    readFile("/schedules.html", &html);
+
+    String schedulesStr ="";
+    String daysStr ="";
+    String timesStr ="";
+
+    for (DataSchedule& schedule : schedules->data_schedules) {
+        Serial.println(schedule.name);
+        schedulesStr += schedule.name +",";
+        for (bool day : schedule.time.days) { daysStr += String(day); }
+        daysStr += ",";
+        timesStr += String(schedule.time.hour) + ":" + String(schedule.time.minute) + ",";
+    }
+    for (ToggleSchedule& schedule : schedules->toggle_schedules) {
+        Serial.println(schedule.name);
+        schedulesStr += schedule.name +",";
+        for (bool day : schedule.time.days) { daysStr += String(day); }
+        daysStr += ",";
+        timesStr += String(schedule.time.hour) + ":" + String(schedule.time.minute) + ",";
+    }
+    if (schedulesStr.length() > 0) {
+        schedulesStr.remove(schedulesStr.length() - 1);
+        daysStr.remove(daysStr.length() - 1);
+        timesStr.remove(timesStr.length() - 1);
+    }
+
+
+    html.replace("{names}", schedulesStr);
+    html.replace("{days}", daysStr);
+    html.replace("{times}", timesStr);
+
+    server.send(200, "text/html", html);
+}

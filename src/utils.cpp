@@ -132,6 +132,28 @@ unsigned int findElement(const String &option, vector<String> &vec) {
     return optionPtr - vec.begin();
 }
 
+String vectorToString(vector<String> &vec) {
+    String result = "";
+    for (String& i : vec) {
+        result += i +",";
+    }
+    if (result.length() > 0) {
+        result.remove(result.length() - 1);
+    }
+    return result;
+}
+
+String vectorToString(vector<int> &vec) {
+    String result = "";
+    for (int i : vec) {
+        result += String(i) +",";
+    }
+    if (result.length() > 0) {
+        result.remove(result.length() - 1);
+    }
+    return result;
+}
+
 bool getProfile(const String& profile, String& curr_profile, vector<String>& profiles, Mem*& mem) {
     if (count(profiles.begin(), profiles.end(), profile) > 0) {
         if (profile != curr_profile) {
