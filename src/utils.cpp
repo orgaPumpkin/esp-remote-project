@@ -115,6 +115,7 @@ void sendMessage(vector<int>& message, int pin, Mem* mem) {
         }
         state = !state;
     }
+    Serial.println("sent message");
 }
 
 int findField(String field, Mem* mem) {
@@ -131,12 +132,11 @@ unsigned int findElement(const String &option, vector<String> &vec) {
     return optionPtr - vec.begin();
 }
 
-bool getProfile(String profile, String& curr_profile, vector<String>& profiles, Mem*& mem, Schedules*& schedules) {
+bool getProfile(const String& profile, String& curr_profile, vector<String>& profiles, Mem*& mem) {
     if (count(profiles.begin(), profiles.end(), profile) > 0) {
         if (profile != curr_profile) {
             curr_profile = profile;
             loadMem(mem, profile+".mem");
-            loadSchedules(schedules, profile+".sch");
         }
     } else {
         return false;
@@ -144,28 +144,39 @@ bool getProfile(String profile, String& curr_profile, vector<String>& profiles, 
     return true;
 }
 
-void sendSchedules(Schedules* schedules, Mem* mem, NTPClient& timeClient, int ir_pin) {
+void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
+    Mem* mem;
     // data
     Serial.println(timeClient.getFormattedTime());
     for (DataSchedule schedule : schedules->data_schedules) {
         if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
+            Serial.println(schedule.name);
+            loadMem(mem, schedule.profile);
+
             vector<fieldValue> fields = getFieldsSchedule(schedule, mem);
             vector<int> message = buildDataMessage(fields, mem);
             sendMessage(message, ir_pin, mem);
+
             delay(100);
         }
     }
+    Serial.println("done data");
     // toggle
     for (ToggleSchedule schedule : schedules->toggle_schedules) {
         if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
+            Serial.println(schedule.name);
+            loadMem(mem, schedule.profile);
+
             unsigned int toggleI = findElement(schedule.toggle_name, mem->toggle_names);
             Serial.println(toggleI);
             if (toggleI < mem->toggle_names.size()) {
                 Serial.println("toggle schedule");
                 vector<int> message = mem->toggles[toggleI];
                 sendMessage(message, ir_pin, mem);
+
                 delay(100);
             }
         }
     }
+    Serial.println("done toggle");
 }

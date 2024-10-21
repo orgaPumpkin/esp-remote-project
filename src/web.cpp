@@ -138,6 +138,7 @@ void rootRemove(ESP8266WebServer& server, vector<String>& profiles) {
         unsigned int found = findElement(server.arg("delete"), profiles);
         if (found < profiles.size()) {
             profiles.erase(profiles.begin() + found);
+            LittleFS.remove(server.arg("delete")+".mem");
 
             File f = LittleFS.open("/profiles.txt", "w");
             for (String line : profiles) {
@@ -146,12 +147,10 @@ void rootRemove(ESP8266WebServer& server, vector<String>& profiles) {
             f.close();
 
             rootShow(server, profiles);
-        } else {
-            rootShow(server, profiles);
+            return;
         }
-    } else {
-        server.send(403, "text/html", "failed");
     }
+    server.send(403, "text/html", "failed");
 }
 
 void rootAdd(ESP8266WebServer& server, vector<String>& profiles) {
@@ -169,10 +168,6 @@ void rootAdd(ESP8266WebServer& server, vector<String>& profiles) {
         server.send(403, "text/html", "failed");
     }
 }
-
-
-
-
 
 
 // remote

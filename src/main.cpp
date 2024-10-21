@@ -87,7 +87,8 @@ void setup() {
         f.close();
     }
 
-    getProfile(g_profiles[0], g_profile, g_profiles, g_mem, g_schedules);
+    getProfile(g_profiles[0], g_profile, g_profiles, g_mem);
+    loadSchedules(g_schedules);
 
     // web server setup
     startWIFI(g_wifi_ssid, g_wifi_pass);
@@ -104,6 +105,7 @@ void setup() {
     server.onNotFound(handleNotFound);
     server.begin();
 
+    timeClient.setUpdateInterval(1000*60*5);
     timeClient.begin();
 
     digitalWrite(led_pin, HIGH);
@@ -127,6 +129,7 @@ void handleRoot() {
         if (server.method() == HTTP_POST) {
             if (server.hasArg("delete")) {
                 rootRemove(server, g_profiles);
+                g_profile = g_profiles[0];
 
             } else if (server.hasArg("add")) {
                 rootAdd(server, g_profiles);
@@ -163,7 +166,7 @@ void handleLogin() {
 
 void handleRemote() {
     if (checkAuth(server)) {    // user is authenticated
-        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem, g_schedules)) {
+        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem)) {
             if (server.method() == HTTP_POST) {
 
                 if (server.hasArg("toggle")) {
@@ -189,7 +192,7 @@ void handleRemote() {
 void handleEdit() {
     if (checkAuth(server)) {
         // user is authenticated
-        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem, g_schedules)) {
+        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem)) {
             if (server.method() == HTTP_POST) {
                 if (server.hasArg("add_toggle")) {
                     editAddToggle(server, g_mem, sensor_pin, led_pin);
@@ -215,7 +218,7 @@ void handleEdit() {
                 } else if (server.hasArg("reset")) {
                     editReset(server, g_mem, g_schedules);
                     writeMem(g_profile, g_mem);
-                    writeSchedule(g_schedules, g_profile);
+                    writeSchedule(g_schedules);
 
                 } else if (server.hasArg("base")) {
                     editSendBase(server, g_mem, ir_pin);
@@ -273,7 +276,7 @@ void handleSetup() {
 
 void handleEditField() {
     if (checkAuth(server)) {
-        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem, g_schedules)) {
+        if (getProfile(server.arg("profile"), g_profile, g_profiles, g_mem)) {
             if (server.hasArg("field") && findField(server.arg("field"), g_mem) != -1) {
                 if (server.method() == HTTP_POST) {
                     if (server.hasArg("add_option")) {
@@ -338,7 +341,7 @@ void loop() {
     if (timeClient.isTimeSet()) {
         if (minute != timeClient.getMinutes()) {
             minute = timeClient.getMinutes();
-            sendSchedules(g_schedules, g_mem, timeClient, ir_pin);
+            sendSchedules(g_schedules, timeClient, ir_pin);
         }
     }
 }

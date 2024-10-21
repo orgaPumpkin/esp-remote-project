@@ -28,6 +28,7 @@ typedef struct Time {
 
 typedef struct DataSchedule {
     String name;
+    String profile;
     vector<String> field_names;
     vector<String> option_names;
     Time time;
@@ -35,6 +36,7 @@ typedef struct DataSchedule {
 
 typedef struct ToggleSchedule {
     String name;
+    String profile;
     String toggle_name;
     Time time;
 } Toggle;
@@ -56,8 +58,8 @@ void writeBytes(File& file, int x);
 void writeMem(const String& profile, Mem* mem);
 void loadMem(Mem*& mem, const String& profile);
 
-void writeSchedule(Schedules* schedules, const String& profile);
-void loadSchedules(Schedules*& schedules, const String& profile);
+void writeSchedule(Schedules* schedules);
+void loadSchedules(Schedules*& schedules);
 
 
 #endif //MFS_H

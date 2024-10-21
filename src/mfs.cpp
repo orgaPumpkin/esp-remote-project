@@ -271,8 +271,8 @@ void loadMem(Mem*& mem, const String& profile) {
 }
 
 
-void writeSchedule(Schedules* schedules, const String& profile) {
-    File file = LittleFS.open(profile+".sch", "w");
+void writeSchedule(Schedules* schedules) {
+    File file = LittleFS.open("schedules", "w");
     if (!file) {
         Serial.println("Failed to open file for writing");
         return;
@@ -285,6 +285,7 @@ void writeSchedule(Schedules* schedules, const String& profile) {
         writeStringVector(file, schedule.option_names);
         writeBytes(file, reinterpret_cast<char *>(&schedule.time), sizeof(Time));
     }
+    Serial.println("Wrote data schedules");
     // toggles
     writeBytes(file, schedules->data_schedules.size());
     for (ToggleSchedule schedule : schedules->toggle_schedules) {
@@ -295,19 +296,21 @@ void writeSchedule(Schedules* schedules, const String& profile) {
     file.close();
 }
 
-Schedules* readSchedules(const String& profile) {
+Schedules* readSchedules() {
     Schedules* schedules = new Schedules();
-    File file = LittleFS.open(profile+".sch", "r");
-    int count, count2;
+    File file = LittleFS.open("schedules", "r");
+    int count;
 
     // data
     file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
     schedules->data_schedules = vector<DataSchedule>(count);
     for (int i = 0; i < count; i++) {
-        file.readBytes(reinterpret_cast<char *>(&count2), sizeof(int));
+        readString(file, schedules->data_schedules[i].name, '\0');
+        readString(file, schedules->data_schedules[i].profile, '\0');
 
         readStringVector(file, schedules->data_schedules[i].field_names, '\0');
         readStringVector(file, schedules->data_schedules[i].option_names, '\0');
+
         file.readBytes(reinterpret_cast<char *>(&schedules->data_schedules[i].time), sizeof(Time));
     }
 
@@ -315,7 +318,11 @@ Schedules* readSchedules(const String& profile) {
     file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
     schedules->toggle_schedules = vector<ToggleSchedule>(count);
     for (int i = 0; i < count; i++) {
+        readString(file, schedules->toggle_schedules[i].name, '\0');
+        readString(file, schedules->toggle_schedules[i].profile, '\0');
+
         readString(file, schedules->toggle_schedules[i].toggle_name, '\0');
+
         file.readBytes(reinterpret_cast<char *>(&schedules->toggle_schedules[i].time), sizeof(Time));
     }
 
@@ -323,23 +330,24 @@ Schedules* readSchedules(const String& profile) {
     return schedules;
 }
 
-void loadSchedules(Schedules*& schedules, const String& profile) {
-    if (!LittleFS.exists(profile+".sch")) {
+void loadSchedules(Schedules*& schedules) {
+    if (!LittleFS.exists("schedules")) {
         Serial.println("creating schedules");
         schedules = new Schedules;
         schedules->data_schedules = vector<DataSchedule>();
         schedules->toggle_schedules = vector<ToggleSchedule>();
         // schedules->toggle_schedules[0].name = "off";
+        // schedules->toggle_schedules[0].profile = "1";
         // schedules->toggle_schedules[0].toggle_name = "off";
-        // schedules->toggle_schedules[0].time.days[0]=true;
-        // schedules->toggle_schedules[0].time.hour=22;
-        // schedules->toggle_schedules[0].time.minute=4;
+        // schedules->toggle_schedules[0].time.days[1]=true;
+        // schedules->toggle_schedules[0].time.hour=17;
+        // schedules->toggle_schedules[0].time.minute=30;
 
 
-        writeSchedule(schedules, profile+".sch");
+        writeSchedule(schedules);
     } else {
         Serial.println("schedules already exists");
-        schedules = readSchedules(profile+".sch");
+        schedules = readSchedules();
     }
     Serial.println("schedules loaded");
 }
