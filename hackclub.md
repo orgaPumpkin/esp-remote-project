@@ -1,7 +1,7 @@
-<img alt="profiles.png" height="400" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/profiles.png"/>
-<img alt="remote.png" height="400" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/remote.png"/>
-<img alt="edit.png" height="400" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/edit.png"/>
-<img alt="setup.png" height="400" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/setup.png"/>
+<img alt="profiles.png" height="200" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/profiles.png"/>
+<img alt="remote.png" height="200" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/remote.png"/>
+<img alt="edit.png" height="200" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/edit.png"/>
+<img alt="setup.png" height="200" src="https://raw.githubusercontent.com/orgaPumpkin/esp-remote-project/refs/heads/master/setup.png"/>
 
 ![wakatime](https://img.shields.io/endpoint?url=https%3A%2F%2Fwaka.hackclub.com%2Fapi%2Fcompat%2Fshields%2Fv1%2FU07QBRYGVHC%2Fall_time%2Fproject%253Aesp-remote)
 
