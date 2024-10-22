@@ -1,0 +1,142 @@
+<html>
+<script>
+	if ( window.history.replaceState ) {
+		window.history.replaceState( null, null, window.location.href );
+	}
+</script>
+<head>
+	<title>esp-remote: edit schedule</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		.alert{
+			display: none;
+			position: absolute;
+			bottom: 0;
+			background: rgba(116, 195, 225, 1);
+			border: 1px solid #0F3376;
+			border-radius: 15px;
+			width: fit-content	;
+			margin: 3px;
+			padding: 5px;
+		}
+		ul{
+			padding: 0;
+			list-style: none;
+		}
+		html *{
+			color: #191919;
+			font-family: Helvetica,sans-serif;
+		}
+
+		li{
+			display: flex;
+			align-content: center;
+			align-items: center;
+
+		}
+		li a,.toggle-form{
+			margin-left: auto;
+		}
+		li form{
+			margin: 0;
+		}
+		button,input[type=submit],select{
+
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(71, 176, 195);
+			border-radius: 5px;
+			margin: 5px;
+			padding: 5px;
+		}
+		button[name=remove_toggle],button[name=remove_field]{
+			background-color: rgba(255, 0, 0, 0.57);
+		}
+		button:hover, input[type=submit]:hover{
+
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(72, 202, 228);
+		}
+		.container{
+			border: 2px solid #0096C7;
+			background-color: #f3f3f3;
+			width: fit-content;
+			margin: auto;
+			padding: 25px;
+		}
+		html,body{
+			margin: 8px;
+			background-color: #0077B6;
+		}
+		.input_field{
+			border-radius: 5px;
+			padding: 5px;
+			border: 1px solid rgba(0, 0, 0, 0.65);
+			background-color: rgb(71, 176, 195);
+		}
+		@media screen and (max-width: 800px) {
+			.row{flex-direction: row}
+		}
+		select{width: 80%}
+		#data_submit{
+			margin: 0;
+			padding: 10px;
+			width: auto;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<h2>Edit schedule</h2>
+	<!--fields-->
+	<form action="" method="post">
+		<select id="toggles-select" name="toggle" required>
+
+		</select>
+		<label>Time:<br>
+			<select id="days-select" size="7" name="days" multiple>
+				<option value="0">Sunday</option>
+				<option value="1">Monday</option>
+				<option value="2">Tuesday</option>
+				<option value="3">Wednesday</option>
+				<option value="4">Thursday</option>
+				<option value="5">Friday</option>
+				<option value="6">Saturday</option>
+			</select>
+			<input id="time" type="time" value="{time}" name="time" required>
+		</label>
+		<input hidden id="toggles" type="text" value="{toggles}">
+		<input hidden id="last" type="text" value="{last}">
+		<br><br><input id="data_submit" type="submit" value="Update schedule">
+	</form>
+	<br><a id="back" href="/">
+	<button>Back to profiles</button>
+</a>
+</div>
+<div class="alert">
+	<p style="font-size:xx-large;margin:2px" id="alert_text">%s</p>
+	<i style="margin-left: auto;padding: 5px;" onclick="this.parentElement.style.display = 'none';" >&#x2716;</i>
+</div>
+</body>
+<script>
+	const alert_text = document.getElementById("alert_text")
+	if (alert_text.innerText !== ""){
+		alert_text.parentElement.style.display = "flex";
+	}
+	// fields
+
+	const last_option = document.getElementById("last")
+	const toggles = document.getElementById("toggles").value.split(",")
+	const toggles_select = document.getElementById("toggles-select")
+	for (let i = 0; i < toggles.length; i++) {
+		let option = document.createElement("option")
+		option.value = toggles[i]
+		option.innerText = toggles[i]
+		if (toggles[i] === last_option) {
+			option.selected = true;
+		}
+
+		toggles_select.appendChild(option)
+
+	}
+
+</script>
+</html>

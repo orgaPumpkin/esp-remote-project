@@ -266,7 +266,7 @@ void loadMem(Mem*& mem, const String& profile) {
         writeMem(profile+".mem", mem);
     } else {
         Serial.println("mem already exists");
-        mem = readMem(profile+".mem");
+        mem = readMem(profile);
     }
 }
 

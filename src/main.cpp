@@ -18,6 +18,8 @@ void handleSetup();
 
 void handleEditField();
 void handleSchedules();
+void handleEditSchedule();
+
 void handleNotFound();
 
 constexpr int led_pin = LED_BUILTIN;
@@ -101,6 +103,7 @@ void setup() {
     server.on("/setup", handleSetup);
     server.on("/edit_field", handleEditField);
     server.on("/schedules", handleSchedules);
+    server.on("/edit_schedule", handleEditSchedule);
     server.serveStatic("/stylesheet.css", LittleFS, "/stylesheet.css");
     server.onNotFound(handleNotFound);
     server.begin();
@@ -323,6 +326,21 @@ void handleSchedules() {
         server.send(302);
     }
 }
+
+void handleEditSchedule() {
+    if (checkAuth(server)) {
+        if (server.method() == HTTP_POST) {
+
+        } else {
+            editScheduleShow(server, g_schedules);
+        }
+
+    } else {
+        server.sendHeader("Location", "/login");
+        server.send(302);
+    }
+}
+
 
 void handleNotFound() {
     server.send(404, "text/plain", "page not found");

@@ -573,3 +573,74 @@ void schedulesShow(ESP8266WebServer& server, Schedules* schedules) {
 
     server.send(200, "text/html", html);
 }
+
+void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
+    String html = "";
+
+
+    for (DataSchedule& schedule : schedules->data_schedules) {
+        if (schedule.name == server.arg("schedule")) {
+            Serial.println(schedule.name);
+            readFile("/edit_schedule_data.html", &html);
+
+            String daysStr ="";
+            for (bool day : schedule.time.days) { daysStr += String(day); }
+            html.replace("{days}", daysStr);
+
+            String timeStr = String(schedule.time.hour) + ":" + String(schedule.time.minute);
+            html.replace("{time}", timeStr);
+
+            // get fields and options
+            String fieldsStr = "";
+            String optionsStr = "";
+            Mem* mem;
+            loadMem(mem, schedule.profile);
+            for (vector<String> option_names : mem->field_names) {
+                if (unsigned int fieldI = findElement(option_names[0], schedule.field_names) < schedule.field_names.size()) {
+                    for (String option_name : option_names) {
+                        fieldsStr += option_name + ",";
+                    }
+                    fieldsStr[fieldsStr.length()-1] = ';';
+                    optionsStr += schedule.option_names[fieldI] + ",";
+                }
+            }
+            if (fieldsStr.length() >= 1) {
+                fieldsStr.remove(fieldsStr.length() - 1);
+                optionsStr.remove(optionsStr.length() - 1);
+            }
+            html.replace("{fields}", fieldsStr);
+            html.replace("{options}", optionsStr);
+
+            server.send(200, "text/html", html);
+            return;
+        }
+    }
+
+    for (ToggleSchedule& schedule : schedules->toggle_schedules) {
+        if (schedule.name == server.arg("schedule")) {
+            Serial.println(schedule.name);
+            readFile("/edit_schedule_toggle.html", &html);
+
+            String daysStr ="";
+            for (bool day : schedule.time.days) { daysStr += String(day); }
+            html.replace("{days}", daysStr);
+
+            String timeStr = String(schedule.time.hour) + ":" + String(schedule.time.minute);
+            html.replace("{time}", timeStr);
+
+            String togglesStr = "";
+            Mem* mem;
+            loadMem(mem, schedule.profile);
+            for (String& toggle : mem->toggle_names) {
+                togglesStr += toggle + ",";
+            }
+            html.replace("{toggles}", togglesStr);
+
+            html.replace("{last}", schedule.toggle_name);
+
+            server.send(200, "text/html", html);
+            return;
+        }
+    }
+
+}
