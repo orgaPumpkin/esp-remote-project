@@ -538,41 +538,127 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
     }
 }
 
-void schedulesShow(ESP8266WebServer& server, Schedules* schedules) {
+void schedulesShow(ESP8266WebServer& server, Schedules* schedules, vector<String>& profiles, const String& message) {
     String html = "";
     readFile("/schedules.html", &html);
+    html.replace("%s", message);
+
+    String allProfilesStr = "";
+    for (const auto & profile : profiles) {
+        allProfilesStr += profile + ",";
+    }
+    if (allProfilesStr.length() > 0) {
+        allProfilesStr.remove(allProfilesStr.length() - 1);
+    }
+    html.replace("{all-profiles}", allProfilesStr);
+
 
     String schedulesStr ="";
+    String profilesStr ="";
     String daysStr ="";
     String timesStr ="";
 
     for (DataSchedule& schedule : schedules->data_schedules) {
         Serial.println(schedule.name);
         schedulesStr += schedule.name +",";
+        profilesStr += schedule.profile +",";
+
         for (bool day : schedule.time.days) { daysStr += String(day); }
         daysStr += ",";
-        timesStr += String(schedule.time.hour) + ":" + String(schedule.time.minute) + ",";
+        char time[6] = "";
+        sprintf(time, "%02d:%02d", schedule.time.hour, schedule.time.minute);
+        timesStr += String(time) + ",";
     }
     for (ToggleSchedule& schedule : schedules->toggle_schedules) {
         Serial.println(schedule.name);
         schedulesStr += schedule.name +",";
+        profilesStr += schedule.profile +",";
+
         for (bool day : schedule.time.days) { daysStr += String(day); }
         daysStr += ",";
-        timesStr += String(schedule.time.hour) + ":" + String(schedule.time.minute) + ",";
+        char time[6] = "";
+        sprintf(time, "%02d:%02d", schedule.time.hour, schedule.time.minute);
+        timesStr += String(time) + ",";
     }
     if (schedulesStr.length() > 0) {
         schedulesStr.remove(schedulesStr.length() - 1);
+        profilesStr.remove(profilesStr.length() - 1);
         daysStr.remove(daysStr.length() - 1);
         timesStr.remove(timesStr.length() - 1);
     }
 
 
     html.replace("{names}", schedulesStr);
+    html.replace("{profiles}", profilesStr);
     html.replace("{days}", daysStr);
     html.replace("{times}", timesStr);
 
     server.send(200, "text/html", html);
 }
+
+
+void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules* schedules) {
+    if (findElement(server.arg("profile"), profiles) < profiles.size()) {
+        for (DataSchedule& schedule : schedules->data_schedules) {
+            if (schedule.name == server.arg("add")) {
+                schedulesShow(server, schedules, profiles, "name already exists");
+                return;
+            }
+        }
+        for (ToggleSchedule& schedule : schedules->toggle_schedules) {
+            if (schedule.name == server.arg("add")) {
+                schedulesShow(server, schedules, profiles, "name already exists");
+                return;
+            }
+        }
+
+        // valid data
+        Mem* mem;
+        loadMem(mem, server.arg("profile"));
+
+        if (server.arg("toggle") == "1") {
+            ToggleSchedule new_schedule;
+            new_schedule.name = server.arg("add");
+            new_schedule.profile = server.arg("profile");
+            for (bool & day : new_schedule.time.days){
+                day = false;
+            }
+            new_schedule.time.hour = 0;
+            new_schedule.time.minute = 0;
+
+            new_schedule.toggle_name = mem->toggle_names[0];
+
+            schedules->toggle_schedules.push_back(new_schedule);
+
+        } else {
+            DataSchedule new_schedule;
+            new_schedule.name = server.arg("add");
+            new_schedule.profile = server.arg("profile");
+            for (bool & day : new_schedule.time.days){
+                day = false;
+            }
+            new_schedule.time.hour = 0;
+            new_schedule.time.minute = 0;
+
+            new_schedule.field_names = vector<String>();
+            new_schedule.option_names = vector<String>();
+            for (vector<String>& field : mem->field_names) {
+                new_schedule.field_names.push_back(field[0]);
+                new_schedule.option_names.push_back(field[1]);
+            }
+
+            schedules->data_schedules.push_back(new_schedule);
+        }
+
+        writeSchedule(schedules);
+        schedulesShow(server, schedules, profiles, "added schedule");
+
+    } else {
+        schedulesShow(server, schedules, profiles, "no profile found");
+    }
+
+}
+
 
 void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
     String html = "";
@@ -587,7 +673,8 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
             for (bool day : schedule.time.days) { daysStr += String(day); }
             html.replace("{days}", daysStr);
 
-            String timeStr = String(schedule.time.hour) + ":" + String(schedule.time.minute);
+            char timeStr[6] = "";
+            sprintf(timeStr, "%02d:%02d", schedule.time.hour, schedule.time.minute);
             html.replace("{time}", timeStr);
 
             // get fields and options
@@ -596,12 +683,14 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
             Mem* mem;
             loadMem(mem, schedule.profile);
             for (vector<String> option_names : mem->field_names) {
+                for (String option_name : option_names) {
+                    fieldsStr += option_name + ",";
+                }
+                fieldsStr[fieldsStr.length()-1] = ';';
                 if (unsigned int fieldI = findElement(option_names[0], schedule.field_names) < schedule.field_names.size()) {
-                    for (String option_name : option_names) {
-                        fieldsStr += option_name + ",";
-                    }
-                    fieldsStr[fieldsStr.length()-1] = ';';
                     optionsStr += schedule.option_names[fieldI] + ",";
+                } else {
+                    optionsStr += ",";
                 }
             }
             if (fieldsStr.length() >= 1) {
@@ -625,7 +714,8 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
             for (bool day : schedule.time.days) { daysStr += String(day); }
             html.replace("{days}", daysStr);
 
-            String timeStr = String(schedule.time.hour) + ":" + String(schedule.time.minute);
+            char timeStr[6] = "";
+            sprintf(timeStr, "%02d:%02d", schedule.time.hour, schedule.time.minute);
             html.replace("{time}", timeStr);
 
             String togglesStr = "";
@@ -633,6 +723,9 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
             loadMem(mem, schedule.profile);
             for (String& toggle : mem->toggle_names) {
                 togglesStr += toggle + ",";
+            }
+            if (togglesStr.length() >= 1) {
+                togglesStr.remove(togglesStr.length() - 1);
             }
             html.replace("{toggles}", togglesStr);
 

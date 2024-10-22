@@ -76,11 +76,7 @@
 			.row{flex-direction: row}
 		}
 		select{width: 80%}
-		#data_submit{
-			margin: 0;
-			padding: 10px;
-			width: auto;
-		}
+
 	</style>
 </head>
 <body>
@@ -89,13 +85,27 @@
 	<!--fields-->
 	<form action="" method="post">
 		<input hidden id="names" type="text" value="{names}">
+		<input hidden id="profiles" type="text" value="{profiles}">
 		<input hidden id="days" type="text" value="{days}">
 		<input hidden id="times" type="text" value="{times}">
+
+		<input hidden id="all-profiles" type="text" value="{all-profiles}">
 	</form>
 	<ul id="schedules-list"></ul>
-	<br><a id="back" href="/">
-	<button>Back to profiles</button>
-</a>
+
+	<form action="" method="post">
+		<label>Name:
+			<input type="text" name="add" autocomplete="off">
+		</label>
+		<select name="toggle" style="width: min-content">
+			<option value="1">Toggle</option>
+			<option value="0">Data message</option>
+		</select>
+		<select id="add-profiles" name="profile" style="width: min-content"></select>
+		<input type="submit" value="Add" style="background-color: mediumseagreen;">
+	</form>
+
+	<br><a id="back" href="/"><button>Back to profiles</button></a>
 </div>
 <div class="alert">
 	<p style="font-size:xx-large;margin:2px" id="alert_text">%s</p>
@@ -108,26 +118,38 @@
 		alert_text.parentElement.style.display = "flex";
 	}
 
+	const all_profiles = document.getElementById("all-profiles").value.split(",")
+	const profiles_select = document.getElementById("add-profiles")
+	for (let i = 0; i < all_profiles.length; i++) {
+		let new_option = document.createElement("option")
+		new_option.innerText = all_profiles[i]
+		new_option.value = all_profiles[i]
+
+		profiles_select.appendChild(new_option)
+	}
+
+
 	// schedules
 
 	const schedules_list = document.getElementById("schedules-list")
 	const names = document.getElementById("names").value.split(",")
+	const profiles = document.getElementById("profiles").value.split(",")
 	const days = document.getElementById("days").value.split(",")
 	const times = document.getElementById("times").value.split(",")
 	if (names[0] !== "") {
 		for (let i = 0; i < names.length; i++) {
-			schedules_list.appendChild(CreateListItem(names[i], days[i], times[i]))
+			schedules_list.appendChild(CreateListItem(names[i], profiles[i], days[i], times[i]))
 		}
 	}
 
-	function CreateListItem(name, days, time) {
+	function CreateListItem(name, profile, days, time) {
 		const li = document.createElement('li')
 		li.id = name;
 		const p = document.createElement("p")
 		const edit_button = document.createElement("button")
 		const remove_button = document.createElement("button")
 		const form = document.createElement("form")
-		p.innerText = time+" - "+name
+		p.innerText = time+" - "+ profile+" - "+name
 		edit_button.innerText = "Edit"
 		remove_button.innerText = "Remove"
 		remove_button.value = name

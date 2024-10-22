@@ -312,12 +312,12 @@ void handleEditField() {
 void handleSchedules() {
     if (checkAuth(server)) {
         if (server.method() == HTTP_POST) {
-            if (server.hasArg("edit_schedule")) {
-
+            if (server.hasArg("add") && server.hasArg("profile") && server.hasArg("toggle")) {
+                schedulesAdd(server, g_profiles, g_schedules);
             }
 
         } else {
-            schedulesShow(server, g_schedules);
+            schedulesShow(server, g_schedules, g_profiles, "");
         }
 
 
