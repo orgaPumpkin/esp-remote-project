@@ -227,10 +227,7 @@ void remoteToggle(ESP8266WebServer& server, Mem* mem, int ir) {
 void remoteSendData(ESP8266WebServer& server, Mem* mem, int ir) {
     vector<fieldValue> fields = getFieldsServer(server, mem);
     vector<int> message = buildDataMessage(fields, mem);
-    for (int pulse : message) {
-        Serial.print(pulse);
-    }
-    Serial.println("");
+
     sendMessage(message, ir, mem);
     remoteShow(server, mem, "sent data message.");
 }
@@ -272,7 +269,6 @@ void editAddToggle(ESP8266WebServer& server, Mem* mem, int sensor, int led) {
     vector<int> raw_message = vector<int>();
     if (getMessage(raw_message, sensor, led)) {  // if got a message
         unsigned int  toggleI = distance(mem->toggle_names.begin(), find(mem->toggle_names.begin(), mem->toggle_names.end(), server.arg("add_toggle")));
-        Serial.println("toggleI = " + String(toggleI));
         // if toggle doesn't already exist, create
         if (toggleI >= mem->toggle_names.size()) {
             mem->toggle_names.push_back(server.arg("add_toggle"));
@@ -348,14 +344,10 @@ void editRecordBase(ESP8266WebServer& server, Mem* mem, int sensor, int led) {
             mem->error_us += pulse;
         }
         mem->error_us = mem->error_us / raw_message.size()/100 * 40;
-        Serial.println(mem->error_us);
+        Serial.println("error us: " + String(mem->error_us));
 
         vector<int> message = vector<int>();
         processMessage(raw_message, message, mem);
-        for (int pulse : message) {
-            Serial.print(pulse);
-        }
-        Serial.println("");
         mem->base_message = message;
 
         editShow(server, mem, "Length: "+ String(raw_message.size()));
@@ -427,7 +419,6 @@ void editField(ESP8266WebServer& server, Mem* mem, String message) {
     html.replace("{options}", optionsStr);
 
     if (mem->fields[fieldI].size() > 0) {
-        Serial.println("getting disable_fields");
         String disable_fields = "";
         vector<bool> effected = findEffected(fieldI, mem);
         int effected_count = count(effected.begin(), effected.end(), true);
@@ -465,7 +456,6 @@ void editFieldAddOption(ESP8266WebServer& server, Mem* mem, int sensor, int led)
         if (raw_message.size() == mem->base_message.size()) {
             int fieldI = findField(server.arg("field"), mem);
             unsigned int optionI = findElement(server.arg("add_option"), mem->field_names[fieldI])-1;
-            Serial.println("optionI = " + String(optionI));
             // if option doesn't already exist, create
             if (optionI >= mem->field_names[fieldI].size()-1) {
                 mem->field_names[fieldI].push_back(server.arg("add_option"));
@@ -491,9 +481,7 @@ void editFieldAddOption(ESP8266WebServer& server, Mem* mem, int sensor, int led)
 void editFieldRemoveOption(ESP8266WebServer& server, Mem* mem) {
 
     int fieldI = findField(server.arg("field"), mem);
-    Serial.println(server.arg("remove_option"));
     unsigned int optionI = findElement(server.arg("remove_option"), mem->field_names[fieldI])-1;
-    Serial.println("optionI = " + String(optionI));
     if (optionI < mem->fields[fieldI].size()) { // if option exists, remove option
         mem->field_names[fieldI].erase(mem->field_names[fieldI].begin() + optionI+1);
         mem->fields[fieldI].erase(mem->fields[fieldI].begin() + optionI);
@@ -508,7 +496,6 @@ void editFieldRemoveOption(ESP8266WebServer& server, Mem* mem) {
 void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
     int fieldI = findField(server.arg("field"), mem);
     unsigned int optionI = findElement(server.arg("option"), mem->field_names[fieldI])-1;
-    Serial.println("optionI = " + String(optionI));
     if (optionI < mem->fields[fieldI].size()) {
         // get disabled fields
         vector<String> disabled_fields = vector<String>();
@@ -520,13 +507,13 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
             token = ruleStr.substring(start, pos);
             if (findField(token, mem) != -1) {    // if field exists
                 disabled_fields.push_back(token);
-                Serial.println(token);
+                Serial.println("disabled: " + token);
             }
             start = pos + 1;
         }
         if (findField(ruleStr.substring(start), mem) != -1) {   // if field exists
             disabled_fields.push_back(ruleStr.substring(start));
-            Serial.println(ruleStr.substring(start));
+            Serial.println("disabled: " + ruleStr.substring(start));
         }
 
         // save rules
@@ -559,7 +546,6 @@ void schedulesShow(ESP8266WebServer& server, Schedules* schedules, vector<String
     String timesStr ="";
 
     for (DataSchedule& schedule : schedules->data_schedules) {
-        Serial.println(schedule.name);
         schedulesStr += schedule.name +",";
         profilesStr += schedule.profile +",";
 
@@ -570,7 +556,6 @@ void schedulesShow(ESP8266WebServer& server, Schedules* schedules, vector<String
         timesStr += String(time) + ",";
     }
     for (ToggleSchedule& schedule : schedules->toggle_schedules) {
-        Serial.println(schedule.name);
         schedulesStr += schedule.name +",";
         profilesStr += schedule.profile +",";
 
@@ -626,7 +611,11 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
             new_schedule.time.hour = 0;
             new_schedule.time.minute = 0;
 
-            new_schedule.toggle_name = mem->toggle_names[0];
+            if (!mem->toggle_names.empty()) {
+                new_schedule.toggle_name = mem->toggle_names[0];
+            } else {
+                new_schedule.toggle_name = "";
+            }
 
             schedules->toggle_schedules.push_back(new_schedule);
 
@@ -660,14 +649,13 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
 }
 
 
-void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
+void editScheduleShow(ESP8266WebServer& server, Schedules* schedules, const String& message) {
     String html = "";
-
 
     for (DataSchedule& schedule : schedules->data_schedules) {
         if (schedule.name == server.arg("schedule")) {
-            Serial.println(schedule.name);
             readFile("/edit_schedule_data.html", &html);
+            html.replace("%s", message);
 
             String daysStr ="";
             for (bool day : schedule.time.days) { daysStr += String(day); }
@@ -683,11 +671,12 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
             Mem* mem;
             loadMem(mem, schedule.profile);
             for (vector<String> option_names : mem->field_names) {
-                for (String option_name : option_names) {
+                for (String& option_name : option_names) {
                     fieldsStr += option_name + ",";
                 }
                 fieldsStr[fieldsStr.length()-1] = ';';
-                if (unsigned int fieldI = findElement(option_names[0], schedule.field_names) < schedule.field_names.size()) {
+                unsigned int fieldI = findElement(option_names[0], schedule.field_names);
+                if (fieldI < schedule.field_names.size()) {
                     optionsStr += schedule.option_names[fieldI] + ",";
                 } else {
                     optionsStr += ",";
@@ -707,8 +696,8 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
 
     for (ToggleSchedule& schedule : schedules->toggle_schedules) {
         if (schedule.name == server.arg("schedule")) {
-            Serial.println(schedule.name);
             readFile("/edit_schedule_toggle.html", &html);
+            html.replace("%s", message);
 
             String daysStr ="";
             for (bool day : schedule.time.days) { daysStr += String(day); }
@@ -736,4 +725,63 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules) {
         }
     }
 
+    server.send(200, "text/html", "schedule not found");
+}
+
+void editSchedulesEdit(ESP8266WebServer& server, Schedules* schedules) {
+    for (DataSchedule& schedule : schedules->data_schedules) {
+        if (schedule.name == server.arg("schedule")) {
+
+            for (int i=0; i < 7; i++) {
+                if (server.arg("days")[i] == '1') {
+                    schedule.time.days[i] = true;
+                } else {
+                    schedule.time.days[i] = false;
+                }
+            }
+
+            schedule.time.hour = server.arg("time").substring(0, 2).toInt();
+            schedule.time.minute = server.arg("time").substring(3, 5).toInt();
+
+            // get fields and options
+            schedule.field_names = vector<String>();
+            schedule.option_names = vector<String>();
+            for (int argI = 0; argI < server.args(); argI++) {  // for arg in request
+                const String& argName = server.argName(argI);
+                if (argName != "time" && argName != "days" && argName != "schedule") {
+                    // extract all fields data
+                    schedule.field_names.push_back(argName);
+                    schedule.option_names.push_back(server.arg(argName));
+                }
+            }
+
+            writeSchedule(schedules);
+            editScheduleShow(server, schedules, "schedule updated");
+            return;
+        }
+    }
+
+    for (ToggleSchedule& schedule : schedules->toggle_schedules) {
+        if (schedule.name == server.arg("schedule")) {
+
+            for (int i=0; i < 7; i++) {
+                if (server.arg("days")[i] == '1') {
+                    schedule.time.days[i] = true;
+                } else {
+                    schedule.time.days[i] = false;
+                }
+            }
+
+            schedule.time.hour = server.arg("time").substring(0, 2).toInt();
+            schedule.time.minute = server.arg("time").substring(3, 5).toInt();
+
+            schedule.toggle_name = server.arg("toggle");
+
+            writeSchedule(schedules);
+            editScheduleShow(server, schedules, "schedule updated");
+            return;
+        }
+    }
+
+    server.send(200, "text/html", "schedule not found");
 }

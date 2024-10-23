@@ -91,16 +91,16 @@
 		<div id="fields-box"></div>
 		<label>Time:<br>
 			<select id="days-select" size="7" name="days" multiple>
-				<option value="0">Sunday</option>
-				<option value="1">Monday</option>
-				<option value="2">Tuesday</option>
-				<option value="3">Wednesday</option>
-				<option value="4">Thursday</option>
-				<option value="5">Friday</option>
-				<option value="6">Saturday</option>
+				<option value="1000000">Sunday</option>
+				<option value="0100000">Monday</option>
+				<option value="0010000">Tuesday</option>
+				<option value="0001000">Wednesday</option>
+				<option value="0000100">Thursday</option>
+				<option value="0000010">Friday</option>
+				<option value="0000001">Saturday</option>
 			</select>
 			<input id="time" type="time" value="{time}" name="time" required>
-		</label>
+		</label><br>
 		<input hidden id="field" type="text" value="{fields}">
 		<input hidden id="options" type="text" value="{options}">
 		<input hidden id="days" type="text" value="{days}">
@@ -143,7 +143,7 @@
 					let new_option = document.createElement("option")
 					new_option.value = options[j]
 					new_option.innerText = options[j]
-					if (j === parseInt(last_options[i])+1) {
+					if (options[j] === last_options[i]) {
 						new_option.selected = true
 					}
 					new_select.options.add(new_option)

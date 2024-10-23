@@ -93,13 +93,13 @@
 		</select>
 		<label>Time:<br>
 			<select id="days-select" size="7" name="days" multiple>
-				<option value="0">Sunday</option>
-				<option value="1">Monday</option>
-				<option value="2">Tuesday</option>
-				<option value="3">Wednesday</option>
-				<option value="4">Thursday</option>
-				<option value="5">Friday</option>
-				<option value="6">Saturday</option>
+				<option value="1000000">Sunday</option>
+				<option value="0100000">Monday</option>
+				<option value="0010000">Tuesday</option>
+				<option value="0001000">Wednesday</option>
+				<option value="0000100">Thursday</option>
+				<option value="0000010">Friday</option>
+				<option value="0000001">Saturday</option>
 			</select>
 			<input id="time" type="time" value="{time}" name="time" required>
 		</label>
@@ -123,7 +123,7 @@
 	}
 	// fields
 
-	const last_option = document.getElementById("last")
+	const last_option = document.getElementById("last").value
 	const toggles = document.getElementById("toggles").value.split(",")
 	const toggles_select = document.getElementById("toggles-select")
 	for (let i = 0; i < toggles.length; i++) {

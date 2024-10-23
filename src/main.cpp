@@ -330,9 +330,9 @@ void handleSchedules() {
 void handleEditSchedule() {
     if (checkAuth(server)) {
         if (server.method() == HTTP_POST) {
-
+            editSchedulesEdit(server, g_schedules);
         } else {
-            editScheduleShow(server, g_schedules);
+            editScheduleShow(server, g_schedules, "");
         }
 
     } else {
@@ -366,5 +366,4 @@ void loop() {
             sendSchedules(g_schedules, timeClient, ir_pin);
         }
     }
-    delay(10);
 }

@@ -158,7 +158,7 @@ bool getProfile(const String& profile, String& curr_profile, vector<String>& pro
     if (count(profiles.begin(), profiles.end(), profile) > 0) {
         if (profile != curr_profile) {
             curr_profile = profile;
-            loadMem(mem, profile+".mem");
+            loadMem(mem, profile);
         }
     } else {
         return false;
@@ -172,7 +172,7 @@ void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
     Serial.println(timeClient.getFormattedTime());
     for (DataSchedule schedule : schedules->data_schedules) {
         if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
-            Serial.println(schedule.name);
+            Serial.println("sending schedule: " + schedule.name);
             loadMem(mem, schedule.profile);
 
             vector<fieldValue> fields = getFieldsSchedule(schedule, mem);
@@ -182,17 +182,14 @@ void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
             delay(100);
         }
     }
-    Serial.println("done data");
     // toggle
     for (ToggleSchedule schedule : schedules->toggle_schedules) {
         if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
-            Serial.println(schedule.name);
+            Serial.println("sending schedule: " + schedule.name);
             loadMem(mem, schedule.profile);
 
             unsigned int toggleI = findElement(schedule.toggle_name, mem->toggle_names);
-            Serial.println(toggleI);
             if (toggleI < mem->toggle_names.size()) {
-                Serial.println("toggle schedule");
                 vector<int> message = mem->toggles[toggleI];
                 sendMessage(message, ir_pin, mem);
 
@@ -200,5 +197,4 @@ void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
             }
         }
     }
-    Serial.println("done toggle");
 }

@@ -53,8 +53,6 @@ void dumpFile(const char* path) {
 }
 
 void writeFile(const char* path, String content) {
-    Serial.printf("Writing file: %s\n", path);
-
     File file = LittleFS.open(path, "w");
     if (!file) {
         Serial.println("Failed to open file for writing");
@@ -272,6 +270,7 @@ void loadMem(Mem*& mem, const String& profile) {
 
 
 void writeSchedule(Schedules* schedules) {
+    Serial.println("Writing schedules");
     File file = LittleFS.open("/schedules", "w");
     if (!file) {
         Serial.println("Failed to open file for writing");
@@ -341,19 +340,11 @@ void loadSchedules(Schedules*& schedules) {
         Serial.println("creating schedules");
         schedules = new Schedules;
         schedules->data_schedules = vector<DataSchedule>();
-        schedules->toggle_schedules = vector<ToggleSchedule>(1);
-        schedules->toggle_schedules[0].name = "off";
-        schedules->toggle_schedules[0].profile = "Default";
-        schedules->toggle_schedules[0].toggle_name = "off";
-        schedules->toggle_schedules[0].time.days[1]=true;
-        schedules->toggle_schedules[0].time.hour=17;
-        schedules->toggle_schedules[0].time.minute=30;
-
+        schedules->toggle_schedules = vector<ToggleSchedule>();
 
         writeSchedule(schedules);
     } else {
         Serial.println("schedules already exists");
         schedules = readSchedules();
     }
-    Serial.println("schedules loaded");
 }
