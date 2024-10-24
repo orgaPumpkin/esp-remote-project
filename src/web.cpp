@@ -648,6 +648,28 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
 
 }
 
+void schedulesRemove(ESP8266WebServer& server, vector<String>& profiles, Schedules* schedules) {
+    for (unsigned int i=0; i<schedules->data_schedules.size(); i++) {
+        if (schedules->data_schedules[i].name == server.arg("remove")) {
+            schedules->data_schedules.erase(schedules->data_schedules.begin()+i);
+
+            writeSchedule(schedules);
+            schedulesShow(server, schedules, profiles, "schedule removed");
+        }
+    }
+
+    for (unsigned int i=0; i<schedules->toggle_schedules.size(); i++) {
+        if (schedules->toggle_schedules[i].name == server.arg("remove")) {
+            schedules->toggle_schedules.erase(schedules->toggle_schedules.begin()+i);
+
+            writeSchedule(schedules);
+            schedulesShow(server, schedules, profiles, "schedule removed");
+        }
+    }
+
+    schedulesShow(server, schedules, profiles, "schedule not found");
+}
+
 
 void editScheduleShow(ESP8266WebServer& server, Schedules* schedules, const String& message) {
     String html = "";

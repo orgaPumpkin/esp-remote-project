@@ -314,6 +314,8 @@ void handleSchedules() {
         if (server.method() == HTTP_POST) {
             if (server.hasArg("add") && server.hasArg("profile") && server.hasArg("toggle")) {
                 schedulesAdd(server, g_profiles, g_schedules);
+            } else if (server.hasArg("remove")) {
+                schedulesRemove(server, g_profiles, g_schedules);
             }
 
         } else {

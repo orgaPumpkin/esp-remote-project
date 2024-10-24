@@ -59,6 +59,7 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem);
 
 void schedulesShow(ESP8266WebServer& server, Schedules* schedules, vector<String>& profiles, const String& message);
 void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules* schedules);
+void schedulesRemove(ESP8266WebServer& server, vector<String>& profiles, Schedules* schedules);
 
 
 void editScheduleShow(ESP8266WebServer& server, Schedules* schedules, const String& message);
