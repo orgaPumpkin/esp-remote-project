@@ -91,3 +91,16 @@ This feature allows seamless switching between different IR devices.
 
 All you need to do is press `Add Profile` in the _profiles_ page and then give it a name.
 Now you can set up another device and use both of them parallely.
+
+## Message scheduling
+Message scheduling allows you to set times in which a message will be sent.
+
+1. Go to the _setup_ page and set your timezone.
+2. Go back to the _profiles_ page and then click `Schedules`.
+3. Create a schedule with the wanted name, message type and profile.
+4. Click `edit` next to the schedule and set the wanted details.
+
+Note that the message scheduling feature requires an internet connection (Will not work in AP mode).
+
+# Credits
+Thanks for [@mouseylicense](https://github.com/mouseylicense) for helping with the UI.
