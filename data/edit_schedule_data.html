@@ -144,7 +144,7 @@
 		for(let i=0;i < selected.length;i++){
 			selected_days = selected_days + parseInt(selected[i]);
 		}
-		days.value = selected_days;
+		days.value = selected_days.toString().padStart(7, '0');
 
 
 	}
