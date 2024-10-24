@@ -261,7 +261,7 @@ void loadMem(Mem*& mem, const String& profile) {
         mem->toggles = vector<vector<int>>();
         mem->fields = vector<vector<vector<int>>>();
         mem->rules = vector<vector<vector<String>>>();
-        writeMem(profile+".mem", mem);
+        writeMem(profile, mem);
     } else {
         Serial.println("mem already exists");
         mem = readMem(profile);
