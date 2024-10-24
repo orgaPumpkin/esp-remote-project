@@ -96,6 +96,41 @@
 </div>
 </body>
 <script>
+
+	function getSelectValues(select) {
+		var result = [];
+		var options = select && select.options;
+		var opt;
+
+		for (var i=0, iLen=options.length; i<iLen; i++) {
+			opt = options[i];
+
+			if (opt.selected) {
+				result.push(opt.value || opt.text);
+			}
+		}
+		return result;
+	}
+	function returnDays(select) {
+		const days = select.parentNode.querySelector("#edit_rule")
+
+		let selected = []
+		if(getSelectValues(select).length > 0) {
+			selected = getSelectValues(select);
+		}
+		let	selected_days = ""
+		for(let i=0;i < selected.length;i++){
+			selected_days = selected_days + selected[i] + ",";
+		}
+		console.log((selected_days))
+		days.value = selected_days;
+		console.log(days.value)
+		return selected_days
+
+	}
+
+</script>
+<script>
 	const params = new URLSearchParams(document.location.search);
 	const back = document.getElementById("back")
 	back.href = "/edit?profile=" + params.get("profile")
@@ -137,17 +172,21 @@
 		submit_button.innerText = "Disable Fields"
 		submit_button.name = "option"
 		submit_button.value = option
-		new_select.name = "edit_rule"
+		new_select.id = "fields_select"
 		new_select.multiple = true
+		new_select.setAttribute("onClick","returnDays(this)")
 		for (let i = 0; i < disabled_fields.length; i++) {
 			let new_option = document.createElement("option")
 			new_option.value = disabled_fields[i]
 			new_option.text = disabled_fields[i]
 			new_select.append(new_option)
 		}
+		form.innerHTML += "<input type=text hidden id=edit_rule name=edit_rule value=''>"
 		form.append(new_select)
 		form.append(submit_button)
 		return form;
 	}
 </script>
+
+
 </html>

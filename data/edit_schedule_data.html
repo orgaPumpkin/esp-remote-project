@@ -90,7 +90,7 @@
 	<form action="" method="post">
 		<div id="fields-box"></div>
 		<label>Time:<br>
-			<select id="days-select" size="7" name="days" multiple>
+			<select onclick="returnDays()" id="days-select" size="7" multiple>
 				<option value="1000000">Sunday</option>
 				<option value="0100000">Monday</option>
 				<option value="0010000">Tuesday</option>
@@ -101,6 +101,7 @@
 			</select>
 			<input id="time" type="time" value="{time}" name="time" required>
 		</label><br>
+		<input type="text" hidden="hidden" id="days-selected" name="days" value="" >
 		<input hidden id="field" type="text" value="{fields}">
 		<input hidden id="options" type="text" value="{options}">
 		<input hidden id="days" type="text" value="{days}">
@@ -115,6 +116,39 @@
 	<i style="margin-left: auto;padding: 5px;" onclick="this.parentElement.style.display = 'none';" >&#x2716;</i>
 </div>
 </body>
+<script>
+	const days = document.getElementById("days-selected")
+	const select = document.getElementById('days-select')
+
+	function getSelectValues(select) {
+		var result = [];
+		var options = select && select.options;
+		var opt;
+
+		for (var i=0, iLen=options.length; i<iLen; i++) {
+			opt = options[i];
+
+			if (opt.selected) {
+				result.push(opt.value || opt.text);
+			}
+		}
+		return result;
+	}
+	function returnDays() {
+
+		let selected = []
+		if(getSelectValues(select).length > 0) {
+			selected = getSelectValues(select);
+		}
+		let	selected_days = 0
+		for(let i=0;i < selected.length;i++){
+			selected_days = selected_days + parseInt(selected[i]);
+		}
+		days.value = selected_days;
+
+
+	}
+</script>
 <script>
 	const alert_text = document.getElementById("alert_text")
 	if (alert_text.innerText !== ""){
