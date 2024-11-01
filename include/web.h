@@ -51,7 +51,7 @@ void setupUser(ESP8266WebServer& server, String& username, String& password);
 void setupTimeZone(ESP8266WebServer& server, NTPClient& ntp);
 
 
-void editField(ESP8266WebServer& server, Mem* mem, String message);
+void editField(ESP8266WebServer& server, Mem* mem, const String& message);
 void editFieldAddOption(ESP8266WebServer& server, Mem* mem, int sensor, int led);
 void editFieldRemoveOption(ESP8266WebServer& server, Mem* mem);
 void editFieldEditRule(ESP8266WebServer& server, Mem* mem);

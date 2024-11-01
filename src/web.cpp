@@ -103,7 +103,7 @@ void loginLogin(ESP8266WebServer& server, String username, String password) {
     if (server.arg("username") == username && server.arg("password") == password) { // right login
         String logid = "";
         addAuth(&logid);
-        server.sendHeader("Location", "/remote");
+        server.sendHeader("Location", "/");
         server.sendHeader("Cache-Control", "no-cache");
         server.sendHeader("Set-Cookie", "logid=" + logid + "; SameSite=Lax");
         server.send(302);
@@ -403,27 +403,27 @@ void setupTimeZone(ESP8266WebServer& server, NTPClient& ntp) {
 
 
 // edit field
-void editField(ESP8266WebServer& server, Mem* mem, String message) {
+void editField(ESP8266WebServer& server, Mem* mem, const String& message) {
     String html = "";
     readFile("/edit_field.html", &html);
     html.replace("{field}", server.arg("field"));
 
-    String optionsStr = "";
     int fieldI = findField(server.arg("field"), mem);
-    for (unsigned int i = 1; i < mem->field_names[fieldI].size(); i++) {
-        optionsStr += mem->field_names[fieldI][i] + ",";
-    }
-    if (optionsStr.length() >= 1) {
-        optionsStr.remove(optionsStr.length() - 1);
-    }
-    html.replace("{options}", optionsStr);
+    if (!mem->fields[fieldI].empty()) {
+        String optionsStr = "";
+        for (unsigned int i = 1; i < mem->field_names[fieldI].size(); i++) {
+            optionsStr += mem->field_names[fieldI][i] + ",";
+        }
+        if (optionsStr.length() >= 1) {
+            optionsStr.remove(optionsStr.length() - 1);
+        }
+        html.replace("{options}", optionsStr);
 
-    if (mem->fields[fieldI].size() > 0) {
         String disable_fields = "";
         vector<bool> effected = findEffected(fieldI, mem);
         int effected_count = count(effected.begin(), effected.end(), true);
         for (unsigned int i = 0; i < mem->fields.size(); i++) {
-            if (i != static_cast<unsigned>(fieldI)) {
+            if (i != static_cast<unsigned>(fieldI) && !mem->fields[i].empty()) {
                 vector<bool> field_effected = findEffected(i, mem);
                 int field_effected_count = count(field_effected.begin(), field_effected.end(), true);
                 if (field_effected_count < effected_count) {
@@ -502,9 +502,9 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
         String ruleStr = server.arg("edit_rule");
         int pos = 0;
         int start = 0;
-        String token;
-        while ((pos = ruleStr.indexOf(',')) != -1) {    // while have extra comma
-            token = ruleStr.substring(start, pos);
+        while ((pos = ruleStr.indexOf(','), start) < ruleStr.length()) {    // while have extra comma
+            Serial.println(start);
+            String token = ruleStr.substring(start, pos);
             if (findField(token, mem) != -1) {    // if field exists
                 disabled_fields.push_back(token);
                 Serial.println("disabled: " + token);
