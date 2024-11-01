@@ -105,6 +105,7 @@ void setup() {
     server.on("/schedules", handleSchedules);
     server.on("/edit_schedule", handleEditSchedule);
     server.serveStatic("/stylesheet.css", LittleFS, "/stylesheet.css");
+    server.serveStatic("/favicon.ico", LittleFS, "/favicon.png");
     server.onNotFound(handleNotFound);
     server.begin();
 
