@@ -5,12 +5,12 @@
 	}
 </script>
 <head>
-	<title>esp-remote: edit remote</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>esp-remote: Edit Remote</title> <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		.alert{
 			display: none;
-			position: absolute;
-			bottom: 0;
+			position: fixed;
+			bottom: 5px;
 			background: rgba(116, 195, 225, 1);
 			border: 1px solid #0F3376;
 			border-radius: 15px;
@@ -89,27 +89,27 @@
 <div class="container">
 	<h2>Edit</h2>
 
-	<h4 style="text-decoration: underline">Constants</h4>
+	<h4>Constants</h4>
 	<ul id="toggle-list"></ul>
 	<!--toggles setup-->
 	<form action="" method="post">
-		<input id="add_toggle" class="input_field" type="text" name="add_toggle" autocomplete="off">
+		<input id="add_toggle" class="input_field" type="text" name="add_toggle" autocomplete="off" placeholder="constant name">
 		<input type="submit" value="Add constant">
 	</form>
 
-	<h4 style="text-decoration: underline">Data message</h4>
+	<h4>Data message</h4>
 	<!--base message-->
 	<form action="" method="post">
-		<button class="button" name="record_base" value="1">Set base data message</button>
-		<button class="button" name="base" value="1">Send base data message</button>
+		<button class="button" name="record_base" value="1">Set base</button>
+		<button class="button" name="base" value="1">Send base</button>
 	</form>
 	<ul id="field-list"></ul>
 	<!--fields setup-->
 	<form action="" method="post">
-		<input id="add_field" class="input_field" type="text" name="add_field" autocomplete="off">
+		<input id="add_field" class="input_field" type="text" name="add_field" autocomplete="off" placeholder="field name">
 		<input type="submit" value="Add field">
 	</form>
-	<form action="" method="post">
+	<br><form action="" method="post">
 		<button style="background-color: rgba(255, 0, 0, 0.57);" class="button" name="reset" value="1">Reset remote</button>
 	</form>
 	<br><a id="back" href="/">

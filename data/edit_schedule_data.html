@@ -5,12 +5,12 @@
 	}
 </script>
 <head>
-	<title>esp-remote: edit schedule</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>esp-remote: Edit Schedule</title> <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		.alert{
 			display: none;
-			position: absolute;
-			bottom: 0;
+			position: fixed;
+			bottom: 5px;
 			background: rgba(116, 195, 225, 1);
 			border: 1px solid #0F3376;
 			border-radius: 15px;
@@ -39,12 +39,11 @@
 		li form{
 			margin: 0;
 		}
-		button,input[type=submit],select{
-
+		button,input[type=submit],input[type=time],select{
 			border: 1px solid rgba(0, 0, 0, 0.65);
 			background-color: rgb(71, 176, 195);
 			border-radius: 5px;
-			margin: 5px;
+			margin: 5px 5px 5px 0;
 			padding: 5px;
 		}
 		button[name=remove_toggle],button[name=remove_field]{
@@ -89,8 +88,8 @@
 	<!--fields-->
 	<form action="" method="post">
 		<div id="fields-box"></div>
-		<label>Time:<br>
-			<select onclick="returnDays()" id="days-select" size="7" multiple>
+		<label style="font-size: x-large;">Time<br>
+			<select onclick="returnDays()" id="days-select" size="7" style="scrollbar-width: none" multiple>
 				<option value="1000000">Sunday</option>
 				<option value="0100000">Monday</option>
 				<option value="0010000">Tuesday</option>
@@ -99,13 +98,13 @@
 				<option value="0000010">Friday</option>
 				<option value="0000001">Saturday</option>
 			</select>
-			<input id="time" type="time" value="{time}" name="time" required>
+			<br><input id="time" type="time" value="{time}" name="time" required>
 		</label><br>
 		<input type="text" hidden="hidden" id="days-selected" name="days" value="" >
 		<input hidden id="field" type="text" value="{fields}">
 		<input hidden id="options" type="text" value="{options}">
 		<input hidden id="days" type="text" value="{days}">
-		<br><br><input id="data_submit" type="submit" value="Update schedule">
+		<br><input id="data_submit" type="submit" value="Update schedule">
 	</form>
 	<br><a id="back" href="/schedules">
 	<button>Back to schedules</button>

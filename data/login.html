@@ -1,6 +1,6 @@
 <html>
 <head>
-    <meta name='viewport' content='width=device-width, initial-scale=1'/><TITLE>login to orga's ac remote</TITLE>
+    <meta name='viewport' content='width=device-width, initial-scale=1'/><TITLE>esp-remote: Login</TITLE>
     <style>
         body *{
             font-family: Helvetica,sans-serif;
@@ -46,8 +46,8 @@
 <body>
 <div class="login-container">
     <p class="message">%s</p>
-    <form action='/login' method='POST'>To Log-in, Please Insert you credentials<br><br>
-        <input type='text' name='username' placeholder='Username'><br><br>
+    <form action='/login' method='POST'>To log-in, please insert your credentials<br><br>
+        <input type='text' name='username' placeholder='Username' autocomplete="off" autofocus><br><br>
         <input type='password' name='password' placeholder='Password'><br><br>
         <input type='submit' name='submit' value='Submit'>
 	</form>

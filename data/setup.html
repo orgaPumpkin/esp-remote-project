@@ -5,12 +5,12 @@
 	}
 </script>
 <head>
-	<title>esp-remote: setup</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>esp-remote: Setup</title> <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		.alert{
 			display: none;
-			position: absolute;
-			bottom: 0;
+			position: fixed;
+			bottom: 5px;
 			background: rgba(116, 195, 225, 1);
 			border: 1px solid #0F3376;
 			border-radius: 15px;
@@ -61,33 +61,25 @@
 <div class="container">
 	<h2>Setup</h2>
 	<!--wifi-->
-	<h4 style="text-decoration: underline">Wi-fi</h4>
+	<h3>Wi-fi</h3>
 	<form action="" method="post">
-		<label>WiFi ssid:
-			<input class="input_field" type="text" name="wifi_ssid" autocomplete="off">
-		</label>
+		<input class="input_field" type="text" name="wifi_ssid" autocomplete="off" placeholder="SSID">
 		<br><br>
-		<label>WiFi password:
-			<input class="input_field" type="password" name="wifi_pass" autocomplete="off">
-		</label>
+		<input class="input_field" type="password" name="wifi_pass" autocomplete="off" placeholder="Password">
 		<br><br>
 		<input type="submit" value="Set WiFi details">
 	</form>
 
 	<!--credentials-->
-	<h4 style="text-decoration: underline">Credentials</h4>
+	<br><h3>Credentials</h3>
 	<form action="" method="post">
-		<label>username:
-			<input class="input_field" type="text" name="username" autocomplete="off">
-		</label>
+		<input class="input_field" type="text" name="username" autocomplete="off" placeholder="Username">
 		<br><br>
-		<label>password:
-			<input class="input_field" type="password" name="password" autocomplete="off">
-		</label>
+		<input class="input_field" type="password" name="password" autocomplete="off" placeholder="Password">
 		<br><br>
 		<input type="submit" value="Set login credentials">
 	</form>
-	<form action="" method="post">
+	<br><form action="" method="post">
 		<label>UTC +
 			<input class="input_field" type="number" name="timezone" min="-12" max="14" value="0">
 			<input type="submit" value="Set timezone">

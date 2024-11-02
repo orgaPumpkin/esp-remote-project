@@ -5,12 +5,12 @@
 	}
 </script>
 <head>
-	<title>esp-remote: schedules</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>esp-remote: Schedules</title> <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		.alert{
 			display: none;
-			position: absolute;
-			bottom: 0;
+			position: fixed;
+			bottom: 5px;
 			background: rgba(116, 195, 225, 1);
 			border: 1px solid #0F3376;
 			border-radius: 15px;
@@ -38,6 +38,14 @@
 		}
 		li form{
 			margin: 0;
+		}
+		input{
+			padding: 5px;
+			border: 1px solid #0096C7;
+			border-radius: 5px;
+		}
+		input[type=text],input[type=password]{
+			background-color: #fefefe;
 		}
 		button,input[type=submit],select{
 
@@ -94,9 +102,7 @@
 	<ul id="schedules-list"></ul>
 
 	<form action="" method="post">
-		<label>Name:
-			<input type="text" name="add" autocomplete="off">
-		</label>
+		<input type="text" name="add" placeholder="schedule name" autocomplete="off">
 		<select name="toggle" style="width: min-content">
 			<option value="1">Constant message</option>
 			<option value="0">Data message</option>

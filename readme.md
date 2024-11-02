@@ -55,15 +55,15 @@ To be able to set up your device's IR protocol correctly, you should read [this]
 5. Click `Add constant` and then send the wanted message with your device's remote.
    Make sure to point the remote at the IR receiver.
 6. Go back to the _profiles_ page by clicking `Back to profiles`. Then, click on the "Default" profile to get to the _remote_ page.
-7. Try your new constant by clicking on it in the webpage. Make sure that the LED is pointing at your device.
+7. Try your new constant by clicking it on the webpage. Make sure that the LED is pointing at your device.
 
 ## Set base data message.
 The first step in configuring a device with data messages is setting a basic example message.
 1. Go back to the profile's _edit_ page.
-2. Click `Set base data message` and then send any data message with your device's remote.
+2. Click `Set base` and then send any data message with your device's remote.
 3. Repeat step two 3–4 times to make sure that the whole message is being received.
    make sure that the last message you record has the maximum length you've gotten.
-4. Try the base data message by clicking `Send base data message`.
+4. Try the base data message by clicking `Send base`.
 
 ## Set up data message fields.
 1. Choose what field you want to add, enter the field's name under _Data message_.

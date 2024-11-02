@@ -5,12 +5,12 @@
 	}
 </script>
 <head>
-	<title>esp-remote: remote</title> <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>esp-remote: Remote</title> <meta name="viewport" content="width=device-width, initial-scale=1">
 	<style>
 		.alert{
 			display: none;
-			position: absolute;
-			bottom: 0;
+			position: fixed;
+			bottom: 5px;
 			background: rgba(116, 195, 225, 1);
 			border: 1px solid #0F3376;
 			border-radius: 15px;
@@ -44,7 +44,7 @@
 			border: 1px solid rgba(0, 0, 0, 0.65);
 			background-color: rgb(71, 176, 195);
 			border-radius: 5px;
-			margin: 5px;
+			margin: 5px 5px 5px 0;
 			padding: 5px;
 		}
 		button[name=remove_toggle],button[name=remove_field]{
@@ -87,13 +87,13 @@
 <div class="container">
 	<h2>Remote</h2>
 	<!--toggles-->
-	<h4 hidden id="toggles_head" style="text-decoration: underline">Constants</h4>
+	<h4 hidden id="toggles_head">Constants</h4>
 	<form id="toggle_form" action="" method="post">
 		<div id="toggles-box"></div>
 		<input hidden id="toggle" type="text" value="{toggles}">
 	</form>
 	<!--fields-->
-	<h4 hidden id="data_head" style="text-decoration: underline">Data message</h4>
+	<h4 hidden id="data_head">Data message</h4>
 	<form action="" method="post">
 		<div id="fields-box"></div>
 		<input hidden id="field" type="text" value="{fields}">
