@@ -204,6 +204,7 @@ void writeMem(const String& profile, Mem* mem) {
     }
     // Serial.println("wrote fields");
 
+    Serial.println(file.size());
     file.close();
 }
 
@@ -263,8 +264,9 @@ void loadMem(Mem*& mem, const String& profile) {
         mem->rules = vector<vector<vector<String>>>();
         writeMem(profile, mem);
     } else {
-        Serial.println("mem already exists");
+        Serial.print("mem already exists. reading... ");
         mem = readMem(profile);
+        Serial.println("success");
     }
 }
 
@@ -298,6 +300,7 @@ void writeSchedule(Schedules* schedules) {
 
         writeBytes(file, reinterpret_cast<char *>(&schedule.time), sizeof(Time));
     }
+    Serial.println(file.size());
     file.close();
 }
 

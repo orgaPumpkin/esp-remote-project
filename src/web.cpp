@@ -527,6 +527,7 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
 }
 
 void schedulesShow(ESP8266WebServer& server, Schedules* schedules, vector<String>& profiles, const String& message) {
+    Serial.println("showing schedules");
     String html = "";
     readFile("/schedules.html", &html);
     html.replace("%s", message);
@@ -603,7 +604,8 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
         loadMem(mem, server.arg("profile"));
 
         if (server.arg("toggle") == "1") {
-            ToggleSchedule new_schedule;
+            schedules->toggle_schedules.emplace_back();
+            ToggleSchedule new_schedule = schedules->toggle_schedules[schedules->toggle_schedules.size()-1];
             new_schedule.name = server.arg("add");
             new_schedule.profile = server.arg("profile");
             for (bool & day : new_schedule.time.days){
@@ -618,10 +620,9 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
                 new_schedule.toggle_name = "";
             }
 
-            schedules->toggle_schedules.push_back(new_schedule);
-
         } else {
-            DataSchedule new_schedule;
+            schedules->data_schedules.emplace_back();
+            DataSchedule new_schedule = schedules->data_schedules[schedules->data_schedules.size()-1];
             new_schedule.name = server.arg("add");
             new_schedule.profile = server.arg("profile");
             for (bool & day : new_schedule.time.days){
@@ -636,9 +637,8 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
                 new_schedule.field_names.push_back(field[0]);
                 new_schedule.option_names.push_back(field[1]);
             }
-
-            schedules->data_schedules.push_back(new_schedule);
         }
+        delete mem;
 
         writeSchedule(schedules);
         schedulesShow(server, schedules, profiles, "added schedule");

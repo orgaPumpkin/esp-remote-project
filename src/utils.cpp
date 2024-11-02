@@ -158,6 +158,7 @@ bool getProfile(const String& profile, String& curr_profile, vector<String>& pro
     if (count(profiles.begin(), profiles.end(), profile) > 0) {
         if (profile != curr_profile) {
             curr_profile = profile;
+            delete mem;
             loadMem(mem, profile);
         }
     } else {
@@ -167,18 +168,18 @@ bool getProfile(const String& profile, String& curr_profile, vector<String>& pro
 }
 
 void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
-    Mem* mem;
     // data
     Serial.println(timeClient.getFormattedTime());
     for (DataSchedule schedule : schedules->data_schedules) {
         if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
             Serial.println("sending schedule: " + schedule.name);
+            Mem* mem;
             loadMem(mem, schedule.profile);
 
             vector<fieldValue> fields = getFieldsSchedule(schedule, mem);
             vector<int> message = buildDataMessage(fields, mem);
             sendMessage(message, ir_pin, mem);
-
+            delete mem;
             delay(100);
         }
     }
@@ -186,6 +187,7 @@ void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
     for (ToggleSchedule schedule : schedules->toggle_schedules) {
         if (schedule.time.minute == timeClient.getMinutes() && schedule.time.hour == timeClient.getHours() && schedule.time.days[timeClient.getDay()]) {
             Serial.println("sending schedule: " + schedule.name);
+            Mem* mem;
             loadMem(mem, schedule.profile);
 
             unsigned int toggleI = findElement(schedule.toggle_name, mem->toggle_names);
@@ -195,6 +197,7 @@ void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
 
                 delay(100);
             }
+            delete mem;
         }
     }
 }
