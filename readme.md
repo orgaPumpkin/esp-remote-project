@@ -19,7 +19,7 @@ The esp-remote connects to the internet via Wi-Fi and can then be controlled fro
 1. Get the program's binary files `firmware.bin` and `littlefs.bin` from the [releases](https://github.com/orgaPumpkin/esp-remote/releases) page.
 2. Go to the [esptool web page](https://espressif.github.io/esptool-js/).
 3. Connect the esp to your computer, click connect and select your esp device's port.
-4. Upload the `firmware.bin` file at address 0x00000000 and the `littlefs.bin` file at 0x00300000.
+4. Upload the `firmware.bin` file at address 0x00000000 and the `littlefs.bin` file at 0x00100000.
    Your setup should look like this:
 
    ![flash.png](flash.png)
