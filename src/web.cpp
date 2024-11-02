@@ -441,6 +441,7 @@ void editField(ESP8266WebServer& server, Mem* mem, const String& message) {
         }
         html.replace("{disable_fields}", disable_fields);
     } else {
+        html.replace("{options}", "");
         html.replace("{disable_fields}", "");
     }
 
@@ -500,8 +501,8 @@ void editFieldEditRule(ESP8266WebServer& server, Mem* mem) {
         // get disabled fields
         vector<String> disabled_fields = vector<String>();
         String ruleStr = server.arg("edit_rule");
-        int pos = 0;
-        int start = 0;
+        unsigned int pos = 0;
+        unsigned int start = 0;
         while ((pos = ruleStr.indexOf(','), start) < ruleStr.length()) {    // while have extra comma
             Serial.println(start);
             String token = ruleStr.substring(start, pos);
