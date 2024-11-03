@@ -9,15 +9,15 @@ using std::vector;
 
 typedef struct Mem {
     int error_us;
-    vector<int> base_message;
+    vector<unsigned char> base_message;
     vector<int> low_ranges;
     vector<int> high_ranges;
-    vector<int> last_options;
+    vector<unsigned char> last_options;
     vector<String> toggle_names;
     vector<vector<String>> field_names;
-    vector<vector<int>> toggles;
+    vector<vector<unsigned char>> toggles;
     vector<vector<vector<String>>> rules;
-    vector<vector<vector<int>>> fields;
+    vector<vector<vector<unsigned char>>> fields;
 } Mem;
 
 typedef struct Time {
@@ -49,7 +49,7 @@ typedef struct Schedules {
 void mountFS();
 void listDir(const char *dirname);
 void readFile(const char* path, String* buf);
-void dumpFile(const char* path);
+void dumpFile(const String& path);
 void writeFile(const char *path, String content);
 
 void readString(File file, String& data, char terminator);

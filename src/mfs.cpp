@@ -33,9 +33,7 @@ void readFile(const char* path, String* buf) {
     file.close();
 }
 
-void dumpFile(const char* path) {
-    Serial.printf("Dumping file: %s\n", path);
-
+void dumpFile(const String& path) {
     File file = LittleFS.open(path, "r");
     if (!file) {
         Serial.println("Failed to open file for reading");
@@ -77,58 +75,97 @@ void writeBytes(File& file, char* x, const size_t size) {
 void writeBytes(File& file, int x) {
     writeBytes(file, reinterpret_cast<char *>(&x), sizeof(int));
 }
+void writeBytesShort(File& file, unsigned short x) {
+    writeBytes(file, reinterpret_cast<char *>(&x), sizeof(unsigned short));
+}
 
 void writeVector(File file, vector<int>& vec) {
-    size_t count = vec.size();
-    writeBytes(file, count);
-    if (count > 0) {
-        file.write(reinterpret_cast<const char*>(&(vec[0])), vec.size()*sizeof(int));
-    }
+    auto count = static_cast<unsigned short>(vec.size());
+    writeBytesShort(file, count);
+    file.write(reinterpret_cast<const char*>(&(vec[0])), vec.size()*sizeof(int));
 }
+void writeVector(File file, vector<unsigned char>& vec) {
+    auto count = static_cast<unsigned short>(vec.size());
+    writeBytesShort(file, count);
+    file.write(&vec[0], vec.size()*sizeof(unsigned char));
+}
+
+
 void writeVector2(File file, vector<vector<int>>& vec) {
-    writeBytes(file, vec.size());
+    auto count = static_cast<unsigned short>(vec.size());
+    writeBytesShort(file, count);
     for (vector<int> intVec : vec) {
         writeVector(file, intVec);
     }
 }
+void writeVector2(File file, vector<vector<unsigned char>>& vec) {
+    auto count = static_cast<unsigned short>(vec.size());
+    writeBytesShort(file, count);
+    for (vector<unsigned char> charVec : vec) {
+        writeVector(file, charVec);
+    }
+}
 
 vector<int> readVector(File file) {
-    size_t count;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    unsigned short count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(unsigned short));
     vector<int> vec(count);
     if (count > 0) {
         file.readBytes(reinterpret_cast<char*>(&vec[0]), count*sizeof(int));
     }
     return vec;
 }
+vector<unsigned char> readVectorChar(File file) {
+    unsigned short count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(unsigned short));
+    vector<unsigned char> vec(count);
+    if (count > 0) {
+        file.readBytes(reinterpret_cast<char*>(&vec[0]), count*sizeof(unsigned char));
+    }
+    return vec;
+}
+
 vector<vector<int>> readVector2(File file) {
-    size_t count;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    unsigned short count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(unsigned short));
     vector<vector<int>> vec = vector<vector<int>>(count);
-    for (size_t i = 0; i < count; i++) {
+    for (unsigned short i = 0; i < count; i++) {
         vec[i] = readVector(file);
     }
     return vec;
 }
 
-void writeString(File file, String content) {
+vector<vector<unsigned char>> readVector2Char(File file) {
+    unsigned short count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(unsigned short));
+    vector<vector<unsigned char>> vec = vector<vector<unsigned char>>(count);
+    for (unsigned short i = 0; i < count; i++) {
+        vec[i] = readVectorChar(file);
+    }
+    return vec;
+}
+
+void writeString(File file, const String& content) {
     file.print(content);
     file.write(0);
 }
 void writeStringVector(File& file, vector<String>& vec) {
-    writeBytes(file, vec.size());
-    for (String string : vec) {
+    auto count = static_cast<unsigned short>(vec.size());
+    writeBytesShort(file, count);
+    for (String& string : vec) {
         writeString(file, string);
     }
 }
 void writeStringVector2(File& file, vector<vector<String>>& vec) {
-    writeBytes(file, vec.size());
+    auto count = static_cast<unsigned short>(vec.size());
+    writeBytesShort(file, count);
     for (vector<String> str_vector : vec) {
         writeStringVector(file, str_vector);
     }
 }
 void writeStringVector3(File& file, vector<vector<vector<String>>>& vec) {
-    writeBytes(file, vec.size());
+    auto count = static_cast<unsigned short>(vec.size());
+    writeBytesShort(file, count);
     for (vector<vector<String>> str_vector2 : vec) {
         writeStringVector2(file, str_vector2);
     }
@@ -143,26 +180,26 @@ void readString(File file, String& data, char terminator) {
     }
 }
 void readStringVector(File file, vector<String>& data, char terminator) {
-    size_t count;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    unsigned short count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(unsigned short));
     data = vector<String>(count, "");
-    for (size_t i = 0; i < count; i++) {
+    for (unsigned short i = 0; i < count; i++) {
         readString(file, data[i], terminator);
     }
 }
 void readStringVector2(File file, vector<vector<String>>& data, char terminator) {
-    size_t count;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    unsigned short count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(unsigned short));
     data = vector<vector<String>>(count);
-    for (size_t i = 0; i < count; i++) {
+    for (unsigned short i = 0; i < count; i++) {
         readStringVector(file, data[i], terminator);
     }
 }
 void readStringVector3(File file, vector<vector<vector<String>>>& data, char terminator) {
-    size_t count;
-    file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
+    unsigned short count;
+    file.readBytes(reinterpret_cast<char *>(&count), sizeof(unsigned short));
     data = vector<vector<vector<String>>>(count);
-    for (size_t i = 0; i < count; i++) {
+    for (unsigned short i = 0; i < count; i++) {
         readStringVector2(file, data[i], terminator);
     }
 }
@@ -182,7 +219,7 @@ void writeMem(const String& profile, Mem* mem) {
     writeVector(file, mem->base_message);
     writeVector(file, mem->low_ranges);
     writeVector(file, mem->high_ranges);
-    writeVector(file, mem->high_ranges);
+    writeVector(file, mem->last_options);
     // Serial.println("wrote normal vectors");
 
     writeStringVector(file, mem->toggle_names);
@@ -199,7 +236,7 @@ void writeMem(const String& profile, Mem* mem) {
 
     // write int vector vector vector
     writeBytes(file, mem->fields.size());
-    for (vector<vector<int>> field : mem->fields) {
+    for (vector<vector<unsigned char>> field : mem->fields) {
         writeVector2(file, field);
     }
     // Serial.println("wrote fields");
@@ -218,10 +255,10 @@ Mem* readMem(const String& profile) {
     file.readBytes(reinterpret_cast<char *>(&mem->error_us), sizeof(int));
     // Serial.println("read error_us");
 
-    mem->base_message = readVector(file);
+    mem->base_message = readVectorChar(file);
     mem->low_ranges = readVector(file);
     mem->high_ranges = readVector(file);
-    mem->last_options = readVector(file);
+    mem->last_options = readVectorChar(file);
     // Serial.println("read normal vectors");
 
     readStringVector(file, mem->toggle_names, '\0');
@@ -230,7 +267,7 @@ Mem* readMem(const String& profile) {
     readStringVector2(file, mem->field_names, '\0');
     // Serial.println("read field names");
 
-    mem->toggles = readVector2(file);
+    mem->toggles = readVector2Char(file);
     // Serial.println("read toggles");
 
     readStringVector3(file, mem->rules, '\0');
@@ -239,9 +276,9 @@ Mem* readMem(const String& profile) {
     // read int vector vector vector
     size_t count;
     file.readBytes(reinterpret_cast<char *>(&count), sizeof(int));
-    mem->fields = vector<vector<vector<int>>>(count);
+    mem->fields = vector<vector<vector<unsigned char>>>(count);
     for (size_t i = 0; i < count; i++) {
-        mem->fields[i] = readVector2(file);
+        mem->fields[i] = readVector2Char(file);
     }
     // Serial.println("read fields");
 
@@ -254,17 +291,18 @@ void loadMem(Mem*& mem, const String& profile) {
         Serial.println("creating mem");
         mem = new Mem;
         mem->error_us = 300;
-        mem->base_message = vector<int>();
+        mem->base_message = vector<unsigned char>();
         mem->low_ranges = vector<int>();
         mem->high_ranges = vector<int>();
         mem->toggle_names = vector<String>();
         mem->field_names = vector<vector<String>>();
-        mem->toggles = vector<vector<int>>();
-        mem->fields = vector<vector<vector<int>>>();
+        mem->toggles = vector<vector<unsigned char>>();
+        mem->fields = vector<vector<vector<unsigned char>>>();
         mem->rules = vector<vector<vector<String>>>();
         writeMem(profile, mem);
     } else {
         Serial.print("mem already exists. reading... ");
+        // dumpFile(profile+".mem");
         mem = readMem(profile);
         Serial.println("success");
     }
@@ -289,7 +327,7 @@ void writeSchedule(Schedules* schedules) {
 
         writeBytes(file, reinterpret_cast<char *>(&schedule.time), sizeof(Time));
     }
-    Serial.println("Wrote data schedules");
+    // Serial.println("Wrote data schedules");
     // toggles
     writeBytes(file, schedules->toggle_schedules.size());
     for (ToggleSchedule schedule : schedules->toggle_schedules) {

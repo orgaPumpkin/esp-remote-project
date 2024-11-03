@@ -226,7 +226,7 @@ void remoteToggle(ESP8266WebServer& server, Mem* mem, int ir) {
 
 void remoteSendData(ESP8266WebServer& server, Mem* mem, int ir) {
     vector<fieldValue> fields = getFieldsServer(server, mem);
-    vector<int> message = buildDataMessage(fields, mem);
+    vector<unsigned char> message = buildDataMessage(fields, mem);
 
     sendMessage(message, ir, mem);
     remoteShow(server, mem, "sent data message.");
@@ -346,9 +346,7 @@ void editRecordBase(ESP8266WebServer& server, Mem* mem, int sensor, int led) {
         mem->error_us = mem->error_us / raw_message.size()/100 * 40;
         Serial.println("error us: " + String(mem->error_us));
 
-        vector<int> message = vector<int>();
-        processMessage(raw_message, message, mem);
-        mem->base_message = message;
+        processMessage(raw_message, mem->base_message, mem);
 
         editShow(server, mem, "Length: "+ String(raw_message.size()));
     } else {

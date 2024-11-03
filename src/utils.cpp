@@ -45,8 +45,8 @@ void makeRanges(vector<int>& unknown_ranges, vector<int> &result, Mem* mem) {
     result.push_back((minRange+maxRange)/2);
 }
 
-int findRange(int pulse, bool state, Mem* mem) {
-    int closest = -1;
+short findRange(int pulse, bool state, Mem *mem) {
+    short closest = -1;
     int distance = -1;
     vector<int>* ranges;
     if (state) {
@@ -65,14 +65,14 @@ int findRange(int pulse, bool state, Mem* mem) {
     return closest;
 }
 
-void processMessage(vector<int>& raw_message, vector<int>& message, Mem* mem) {
+void processMessage(vector<int>& raw_message, vector<unsigned char> &message, Mem* mem) {
     vector<int> low_unknowns;
     vector<int> high_unknowns;
     bool state = LOW;
 
     // find unknowns
     for (int pulse : raw_message) {
-        int range = findRange(pulse, state, mem);
+        short range = findRange(pulse, state, mem);
         if (range == -1) {
             if (state) {
                 high_unknowns.push_back(pulse);
@@ -84,22 +84,23 @@ void processMessage(vector<int>& raw_message, vector<int>& message, Mem* mem) {
     }
     // make ranges
     if (!high_unknowns.empty()) { makeRanges(high_unknowns, mem->high_ranges, mem);}
-    if (!low_unknowns.empty()) { makeRanges(low_unknowns, mem->low_ranges, mem);;}
+    if (!low_unknowns.empty()) { makeRanges(low_unknowns, mem->low_ranges, mem);}
 
     // assign ranges
-    message = vector<int>();
+    message = vector<unsigned char>();
     state = LOW;
     for (int pulse : raw_message) {
-        message.push_back(findRange(pulse, state, mem));
+        if (findRange(pulse, state, mem) == -1) {Serial.println("Message proccessing error!!!");}
+        message.push_back(static_cast<unsigned char>(findRange(pulse, state, mem)));
         state = !state;
     }
 }
 
-void sendMessage(vector<int>& message, int pin, Mem* mem) {
+void sendMessage(vector<unsigned char> &message, int pin, Mem* mem) {
     unsigned long st;
     bool state = LOW;
     int pulse;
-    for (int range : message) {
+    for (unsigned char range : message) {
         if (!state) {
             pulse = mem->low_ranges[range];
             st = micros();
@@ -177,7 +178,7 @@ void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
             loadMem(mem, schedule.profile);
 
             vector<fieldValue> fields = getFieldsSchedule(schedule, mem);
-            vector<int> message = buildDataMessage(fields, mem);
+            vector<unsigned char> message = buildDataMessage(fields, mem);
             sendMessage(message, ir_pin, mem);
             delete mem;
             delay(100);
@@ -192,7 +193,7 @@ void sendSchedules(Schedules* schedules, NTPClient& timeClient, int ir_pin) {
 
             unsigned int toggleI = findElement(schedule.toggle_name, mem->toggle_names);
             if (toggleI < mem->toggle_names.size()) {
-                vector<int> message = mem->toggles[toggleI];
+                vector<unsigned char> message = mem->toggles[toggleI];
                 sendMessage(message, ir_pin, mem);
 
                 delay(100);

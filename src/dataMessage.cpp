@@ -8,10 +8,10 @@ bool field_sorter(fieldValue const& lhs, fieldValue const& rhs) {
 
 
 vector<bool> findEffected(unsigned int fieldI, Mem* mem) {
-    vector<int> baseOption = mem->fields[fieldI][0];
+    vector<unsigned char> baseOption = mem->fields[fieldI][0];
     vector<bool> result = vector<bool>(baseOption.size(), false);
 
-    for (vector<int> option : mem->fields[fieldI]) {
+    for (vector<unsigned char> option : mem->fields[fieldI]) {
         for (unsigned int i = 0; i < baseOption.size(); i++) {
             if (result[i] == false && option[i] != baseOption[i]) {
                 result[i] = true;
@@ -75,13 +75,13 @@ vector<fieldValue> getFieldsSchedule(DataSchedule& schedule, Mem* mem) {
 }
 
 
-vector<int> buildDataMessage(vector<fieldValue> fields, Mem* mem) {
+vector<unsigned char> buildDataMessage(vector<fieldValue> fields, Mem *mem) {
 
     // sort the fields from biggest to smallest
     sort(fields.begin(), fields.end(), field_sorter);
 
     // build message
-    vector<int> message = mem->base_message;
+    vector<unsigned char> message = mem->base_message;
     vector<String> disabled = vector<String>();
     for (fieldValue field : fields) {
         // check disabled

@@ -17,7 +17,7 @@ typedef struct fieldValue {
 vector<bool> findEffected(unsigned int fieldI, Mem* mem);
 vector<fieldValue> getFieldsServer(ESP8266WebServer& server, Mem* mem);
 vector<fieldValue> getFieldsSchedule(DataSchedule& schedule, Mem* mem);
-vector<int> buildDataMessage(vector<fieldValue> fields, Mem* mem);
+vector<unsigned char> buildDataMessage(vector<fieldValue> fields, Mem* mem);
 
 
 #endif //DATAMESSAGE_H
