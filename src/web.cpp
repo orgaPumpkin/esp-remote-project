@@ -603,7 +603,7 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
 
         if (server.arg("toggle") == "1") {
             schedules->toggle_schedules.emplace_back();
-            ToggleSchedule new_schedule = schedules->toggle_schedules[schedules->toggle_schedules.size()-1];
+            ToggleSchedule& new_schedule = schedules->toggle_schedules[schedules->toggle_schedules.size()-1];
             new_schedule.name = server.arg("add");
             new_schedule.profile = server.arg("profile");
             for (bool & day : new_schedule.time.days){
@@ -620,7 +620,7 @@ void schedulesAdd(ESP8266WebServer& server, vector<String>& profiles, Schedules*
 
         } else {
             schedules->data_schedules.emplace_back();
-            DataSchedule new_schedule = schedules->data_schedules[schedules->data_schedules.size()-1];
+            DataSchedule& new_schedule = schedules->data_schedules[schedules->data_schedules.size()-1];
             new_schedule.name = server.arg("add");
             new_schedule.profile = server.arg("profile");
             for (bool & day : new_schedule.time.days){
@@ -707,6 +707,7 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules, const Stri
                 fieldsStr.remove(fieldsStr.length() - 1);
                 optionsStr.remove(optionsStr.length() - 1);
             }
+            delete mem;
             html.replace("{fields}", fieldsStr);
             html.replace("{options}", optionsStr);
 
@@ -737,8 +738,9 @@ void editScheduleShow(ESP8266WebServer& server, Schedules* schedules, const Stri
             if (togglesStr.length() >= 1) {
                 togglesStr.remove(togglesStr.length() - 1);
             }
-            html.replace("{toggles}", togglesStr);
+            delete mem;
 
+            html.replace("{toggles}", togglesStr);
             html.replace("{last}", schedule.toggle_name);
 
             server.send(200, "text/html", html);
