@@ -25,7 +25,7 @@
 </body>
 <script>
     const profile_container = document.getElementById('profile_container');
-    const profiles = JSON.parse('[' + '"{profiles}"' + ']')
+    const profiles = JSON.parse('[' + '{profiles}' + ']')
     profiles.forEach((profile) => {
         CreateProfile(profile)
     })
