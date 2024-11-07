@@ -8,6 +8,7 @@ void startWIFI(String& ssid, String& pass) {
     if (ssid != "") {
         // connect to WiFi
         Serial.println("Connecting to " + ssid);
+        WiFi.mode(WIFI_STA);
         WiFi.begin(ssid, pass);
         unsigned long st = millis();
         while (WiFi.status() != WL_CONNECTED && millis()-st < 1000*30) {  // Wait for the Wi-Fi connection completion
@@ -23,6 +24,7 @@ void startWIFI(String& ssid, String& pass) {
     }
     // unable to connect to WiFi
     Serial.print("Setting soft-AP ... ");
+    WiFi.mode(WIFI_AP);
     boolean result = WiFi.softAP("ESP-remote");
     if(result == true) {
         Serial.println("Ready");
