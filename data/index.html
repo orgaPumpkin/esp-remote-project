@@ -16,16 +16,16 @@
 </div>
 <br><br><br>
 <a href="/schedules" style="text-decoration-line: none">
-	<button style="background-color: cadetblue; border-color: cadetblue;" class="add_button">Schedules</button>
+	<button style="background-color: #4DB6AC; border-color: #4DB6AC;" class="add_button">Schedules</button>
 </a>
 <br><a href="/setup" style="text-decoration-line: none">
-	<button style="background-color: mediumslateblue; border-color: mediumslateblue;" class="add_button">Setup</button>
+	<button style="background-color: #4a5f6a; border-color: #4a5f6a;" class="add_button">Setup</button>
 </a>
 
 </body>
 <script>
     const profile_container = document.getElementById('profile_container');
-    const profiles = JSON.parse('[' + '{profiles}' + ']')
+    const profiles = JSON.parse('[' + '"{profiles}"' + ']')
     profiles.forEach((profile) => {
         CreateProfile(profile)
     })
