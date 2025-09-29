@@ -60,12 +60,16 @@ void setup() {
     File f = LittleFS.open("/credentials.txt", "r");
     g_wifi_ssid = "";
     readString(f, g_wifi_ssid, '\n');
+    g_wifi_ssid.replace("\r", "");
     g_wifi_pass = "";
     readString(f, g_wifi_pass, '\n');
+    g_wifi_pass.replace("\r", "");
     g_username = "";
     readString(f, g_username, '\n');
+    g_username.replace("\r", "");
     g_password = "";
     readString(f, g_password, '\n');
+    g_password.replace("\r", "");
     f.close();
 
     g_profiles = vector<String>();
@@ -73,6 +77,7 @@ void setup() {
     String line;
     while (f.available()) {
         readString(f, line, '\n');
+        line.replace("\r", "");
         g_profiles.push_back(line);
     }
     f.close();
