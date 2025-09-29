@@ -6,6 +6,7 @@
 
 void startWIFI(String& ssid, String& pass) {
     if (ssid != "") {
+        WiFi.softAPdisconnect(true);
         // connect to WiFi
         Serial.println("Connecting to " + ssid);
         WiFi.mode(WIFI_STA);
@@ -107,7 +108,7 @@ void loginLogin(ESP8266WebServer& server, String username, String password) {
         addAuth(&logid);
         server.sendHeader("Location", "/");
         server.sendHeader("Cache-Control", "no-cache");
-        server.sendHeader("Set-Cookie", "logid=" + logid + "; SameSite=Lax");
+        server.sendHeader("Set-Cookie", "logid=" + logid + "; SameSite=Lax; Max-Age=" + String(COOKIE_EXPIRE));
         server.send(302);
         Serial.println("Logged in");
     } else {    // wrong login

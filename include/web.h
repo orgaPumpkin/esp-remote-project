@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "dataMessage.h"
 
+#define COOKIE_EXPIRE (60*60*24*30)  // seconds
 void startWIFI(String& ssid, String& pass);
 bool checkAuth(ESP8266WebServer &server);
 void addAuth(String* logid);
